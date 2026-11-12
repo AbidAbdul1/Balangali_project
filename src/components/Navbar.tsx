@@ -1,59 +1,27 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Compass, Sparkles, Bookmark, BarChart2, Calendar, Globe2, ChevronDown, Check, FileText, Shirt, Wallet, Shield, MapPin } from 'lucide-react';
-import { useLanguage, CurrencyCode } from '../context/LanguageContext';
-import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../i18n/translations';
+import React from 'react';
+import { Compass, Sparkles, Bookmark, Calendar, Shield, MapPin } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export type NavTab = 'explore' | 'nearby' | 'recommendations' | 'itinerary' | 'budget' | 'assistant' | 'vault' | 'saved';
 
 interface NavbarProps {
   activeTab: NavTab;
   setActiveTab: (tab: NavTab) => void;
-  onOpenEvaluation: () => void;
+  onOpenEvaluation?: () => void;
   savedTripsCount: number;
   onOpenExportSheet?: () => void;
   onOpenPackingList?: () => void;
 }
 
-const CURRENCIES: Array<{ code: CurrencyCode; label: string; symbol: string }> = [
-  { code: 'INR', label: 'INR (₹)', symbol: '₹' },
-  { code: 'USD', label: 'USD ($)', symbol: '$' },
-  { code: 'EUR', label: 'EUR (€)', symbol: '€' },
-  { code: 'GBP', label: 'GBP (£)', symbol: '£' },
-  { code: 'JPY', label: 'JPY (¥)', symbol: '¥' },
-];
-
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
-  onOpenEvaluation,
   savedTripsCount,
-  onOpenExportSheet,
-  onOpenPackingList,
 }) => {
-  const { language, setLanguage, currency, setCurrency, t } = useLanguage();
-  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const [isCurrMenuOpen, setIsCurrMenuOpen] = useState(false);
-
-  const langRef = useRef<HTMLDivElement>(null);
-  const currRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (langRef.current && !langRef.current.contains(event.target as Node)) {
-        setIsLangMenuOpen(false);
-      }
-      if (currRef.current && !currRef.current.contains(event.target as Node)) {
-        setIsCurrMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const currentLangObj = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
+  const { t } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+    <header className="sticky top-0 left-0 right-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4 h-16">
           {/* Brand Wordmark - Luxury Travel Studio Style */}
@@ -81,11 +49,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Navigation Links - Clean Editorial Style */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-1.5">
+          {/* Primary Navigation Links - Fixed Horizontal Bar (Quick Tools moved to Right-Bottom Dock) */}
+          <nav className="hidden md:flex items-center gap-1.5 lg:gap-2">
             <button
               onClick={() => setActiveTab('explore')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer ${activeTab === 'explore'
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer ${activeTab === 'explore'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
@@ -95,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => setActiveTab('nearby')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1 cursor-pointer ${activeTab === 'nearby'
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'nearby'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
@@ -106,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => setActiveTab('recommendations')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer ${activeTab === 'recommendations'
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer ${activeTab === 'recommendations'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
@@ -116,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => setActiveTab('itinerary')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'itinerary'
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'itinerary'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
@@ -126,19 +94,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
-              onClick={() => setActiveTab('budget')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1 cursor-pointer ${activeTab === 'budget'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
-                }`}
-            >
-              <Wallet className="w-3.5 h-3.5" />
-              <span>Budget & Group</span>
-            </button>
-
-            <button
               onClick={() => setActiveTab('assistant')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'assistant'
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'assistant'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
@@ -149,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => setActiveTab('vault')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1 cursor-pointer ${activeTab === 'vault'
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'vault'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
@@ -160,7 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => setActiveTab('saved')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'saved'
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'saved'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
@@ -174,114 +131,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
           </nav>
-
-          {/* Right Zone Controls: Clean & Uncluttered */}
-          <div className="flex items-center gap-2 shrink-0">
-            {onOpenPackingList && (
-              <button
-                onClick={onOpenPackingList}
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-950 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200/80 transition-colors cursor-pointer"
-                title="Smart Packing List Generator"
-              >
-                <Shirt className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Packing</span>
-              </button>
-            )}
-
-            {onOpenExportSheet && (
-              <button
-                onClick={onOpenExportSheet}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-950 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200/80 transition-colors cursor-pointer"
-                title="Print or Save Offline Travel Sheet PDF"
-              >
-                <FileText className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Export PDF</span>
-              </button>
-            )}
-
-            {/* Language Selector Dropdown */}
-            <div className="relative" ref={langRef}>
-              <button
-                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200 cursor-pointer"
-                title="Change Language / భాషను మార్చండి / भाषा बदलें"
-              >
-                <Globe2 className="w-3.5 h-3.5 text-indigo-600" />
-                <span className="font-semibold">{currentLangObj.flag} {currentLangObj.nativeName}</span>
-                <ChevronDown className="w-3 h-3 text-slate-500" />
-              </button>
-
-              {isLangMenuOpen && (
-                <div className="absolute right-0 mt-1.5 w-44 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
-                  <div className="px-3 py-1 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                    Language
-                  </div>
-                  {SUPPORTED_LANGUAGES.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        setLanguage(lang.code);
-                        setIsLangMenuOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${language === lang.code ? 'bg-indigo-50/70 text-indigo-700 font-semibold' : 'text-slate-700'
-                        }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span>{lang.flag}</span>
-                        <span>{lang.nativeName}</span>
-                        <span className="text-[10px] text-slate-400">({lang.name})</span>
-                      </span>
-                      {language === lang.code && <Check className="w-3.5 h-3.5 text-indigo-600" />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Currency Selector */}
-            <div className="relative" ref={currRef}>
-              <button
-                onClick={() => setIsCurrMenuOpen(!isCurrMenuOpen)}
-                className="flex items-center gap-1 px-2 py-1.5 text-xs font-mono font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200 cursor-pointer"
-                title="Select Currency"
-              >
-                <span>{currency}</span>
-                <ChevronDown className="w-3 h-3 text-slate-500" />
-              </button>
-
-              {isCurrMenuOpen && (
-                <div className="absolute right-0 mt-1.5 w-32 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
-                  <div className="px-3 py-1 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                    Currency
-                  </div>
-                  {CURRENCIES.map((c) => (
-                    <button
-                      key={c.code}
-                      onClick={() => {
-                        setCurrency(c.code);
-                        setIsCurrMenuOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${currency === c.code ? 'bg-indigo-50/70 text-indigo-700 font-semibold' : 'text-slate-700'
-                        }`}
-                    >
-                      <span>{c.label}</span>
-                      {currency === c.code && <Check className="w-3 h-3 text-indigo-600" />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* SRS Diagnostics Button */}
-            <button
-              onClick={onOpenEvaluation}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200 cursor-pointer"
-              title="SRS Specifications, Scoring Formula & ML Model Evaluation Metrics"
-            >
-              <BarChart2 className="w-3.5 h-3.5 text-indigo-600" />
-              <span className="hidden xl:inline">Diagnostics</span>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -293,6 +142,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
         >
           {t('explore', 'Explore')}
+        </button>
+        <button
+          onClick={() => setActiveTab('nearby')}
+          className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap cursor-pointer ${activeTab === 'nearby' ? 'bg-white shadow-xs text-indigo-600 font-semibold' : 'text-slate-600'
+            }`}
+        >
+          Nearby & Stays
         </button>
         <button
           onClick={() => setActiveTab('recommendations')}
@@ -314,20 +170,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
         >
           {t('assistant', 'AI Chat')}
-        </button>
-        <button
-          onClick={() => setActiveTab('nearby')}
-          className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap cursor-pointer ${activeTab === 'nearby' ? 'bg-white shadow-xs text-indigo-600 font-semibold' : 'text-slate-600'
-            }`}
-        >
-          Nearby & Stays
-        </button>
-        <button
-          onClick={() => setActiveTab('budget')}
-          className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap cursor-pointer ${activeTab === 'budget' ? 'bg-white shadow-xs text-indigo-600 font-semibold' : 'text-slate-600'
-            }`}
-        >
-          Budget & Group
         </button>
         <button
           onClick={() => setActiveTab('vault')}

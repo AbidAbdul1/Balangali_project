@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { Navbar, NavTab } from './components/Navbar';
 import { InteractiveMap } from './components/InteractiveMap';
 import { PreferenceForm } from './components/PreferenceForm';
@@ -20,6 +21,7 @@ import { TripExportModal } from './components/TripExportModal';
 import { PackingListModal } from './components/PackingListModal';
 import { DestinationShowcase } from './components/DestinationShowcase';
 import { PopularPlaces } from './components/PopularPlaces';
+import { FloatingQuickDock } from './components/FloatingQuickDock';
 
 const NearbyDiscoveryPanel = lazy(() =>
   import('./components/NearbyDiscoveryPanel').then((m) => ({ default: m.NearbyDiscoveryPanel }))
@@ -783,8 +785,8 @@ export default function App() {
   const itemsInPlanCount = itinerary ? itinerary.days.reduce((acc, d) => acc + d.items.length, 0) : 0;
 
   return (
-    <div className="min-h-screen bg-[#fafaf8] flex flex-col text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
-      {/* Top Navbar with Language and Currency Selectors */}
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#fafaf8] flex flex-col text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+      {/* Fixed Top Horizontal Navbar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={(tab) => {
@@ -794,19 +796,24 @@ export default function App() {
             setActiveTab(tab);
           }
         }}
-        onOpenEvaluation={() => setIsEvaluationOpen(true)}
         savedTripsCount={savedTrips.length}
-        onOpenExportSheet={() => setIsExportModalOpen(true)}
-        onOpenPackingList={() => setIsPackingModalOpen(true)}
       />
 
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+      {/* Animated Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed bottom-6 left-6 z-50 bg-slate-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-xl shadow-xl border border-slate-700/80 text-xs flex items-center gap-2"
+          >
+            <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
@@ -827,6 +834,15 @@ export default function App() {
           onClearItinerary={handleClearItinerary}
           onAutoFillPlan={handleAutoFillItinerary}
         />
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+          >
 
         {/* TAB 1: EXPLORE POPULAR PLACES & ESTIMATE COSTS */}
         {activeTab === 'explore' && (
@@ -1236,7 +1252,7 @@ export default function App() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               {/* Left Column: Preferences Form */}
-              <div className="lg:col-span-4 space-y-4">
+              <div className="lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-20">
                 <PreferenceForm
                   preferences={preferences}
                   onUpdatePreferences={(newPrefs) => setPreferences(newPrefs)}
@@ -1258,7 +1274,7 @@ export default function App() {
               </div>
 
               {/* Right Column: Recommendations Results */}
-              <div className="lg:col-span-8 space-y-4">
+              <div className="lg:col-span-7 xl:col-span-8 space-y-4">
                 {recommendations.length === 0 ? (
                   <div className="bg-white rounded-xl border border-slate-200 p-10 text-center shadow-xs">
                     <Sparkles className="w-10 h-10 text-indigo-500 mx-auto mb-3" />
@@ -1494,6 +1510,8 @@ export default function App() {
             </div>
           </div>
         )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Footer */}
@@ -1565,6 +1583,15 @@ export default function App() {
           setIsPackingModalOpen(false);
           setIsExportModalOpen(true);
         }}
+      />
+
+      {/* Vertical Right-Bottom Quick-Action Dock */}
+      <FloatingQuickDock
+        activeTab={activeTab}
+        onSelectTab={(tab) => setActiveTab(tab)}
+        onOpenPackingList={() => setIsPackingModalOpen(true)}
+        onOpenExportSheet={() => setIsExportModalOpen(true)}
+        onOpenDiagnostics={() => setIsEvaluationOpen(true)}
       />
     </div>
   );

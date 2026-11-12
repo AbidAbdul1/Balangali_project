@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { Destination, DestinationCategory } from '../types/travel';
 import {
   MapPin,
@@ -145,11 +146,10 @@ export const PopularPlaces: React.FC<PopularPlacesProps> = ({
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 border ${
-                selectedCategory === cat.id
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 border ${selectedCategory === cat.id
                   ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
                   : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-              }`}
+                }`}
             >
               <span>{cat.icon}</span>
               <span>{cat.label}</span>
@@ -198,20 +198,22 @@ export const PopularPlaces: React.FC<PopularPlacesProps> = ({
       {/* Discovered Places Grid */}
       {!isLoading && !errorMessage && filteredPlaces.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-3">
-          {filteredPlaces.map((place) => {
+          {filteredPlaces.map((place, idx) => {
             const inPlan = planIds.has(place.id);
             const googleMapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
               place.name
             )}&query_place_id=${place.id}`;
 
             return (
-              <div
+              <motion.div
                 key={place.id}
-                className={`group rounded-xl border transition-all duration-200 overflow-hidden flex flex-col bg-white ${
-                  inPlan
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: Math.min(idx * 0.035, 0.35), ease: [0.22, 1, 0.36, 1] }}
+                className={`group rounded-xl border transition-all duration-300 overflow-hidden flex flex-col bg-white hover:-translate-y-0.5 ${inPlan
                     ? 'border-indigo-600 ring-2 ring-indigo-600/10 shadow-sm'
-                    : 'border-slate-200/90 hover:border-indigo-300 hover:shadow-md'
-                }`}
+                    : 'border-slate-200/90 hover:border-indigo-300 hover:shadow-lg'
+                  }`}
               >
                 {/* Place Photo */}
                 <div className="relative h-36 w-full bg-slate-100 overflow-hidden">
@@ -316,7 +318,7 @@ export const PopularPlaces: React.FC<PopularPlacesProps> = ({
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
