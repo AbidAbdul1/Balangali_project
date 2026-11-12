@@ -34,14 +34,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Compass className="w-5 h-5 text-indigo-400" />
               </div>
               <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="font-display text-lg font-extrabold tracking-tight text-slate-900 whitespace-nowrap">
-                    {t('appTitle', 'TRAVELMATE')}
-                  </span>
-                  <span className="text-[10px] font-semibold tracking-wider uppercase text-indigo-600 bg-indigo-50/80 px-1.5 py-0.5 rounded-sm">
-                    AI Studio
-                  </span>
-                </div>
+                <span className="font-display text-lg font-extrabold tracking-tight text-slate-900 whitespace-nowrap">
+                  {t('appTitle', 'TRAVELMATE')}
+                </span>
                 <span className="text-[11px] text-slate-500 font-medium tracking-normal -mt-0.5 hidden sm:inline">
                   Intelligent Travel & Route Suite
                 </span>
