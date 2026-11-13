@@ -262,25 +262,30 @@ export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Connectivity & Offline Sync Banner */}
-      <div className={`rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${isOnline ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
-        <div className="flex items-center gap-3">
-          {isOnline ? <Wifi className="w-5 h-5 text-emerald-600" /> : <WifiOff className="w-5 h-5 text-amber-600" />}
+      {/* Connectivity & Offline Sync Midnight Hero Banner */}
+      <div className="rounded-3xl bg-hero-midnight text-white p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_12px_36px_-10px_rgba(16,24,40,0.2)]">
+        <div className="flex items-center gap-3.5">
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${isOnline ? 'bg-[#14B8A6]/20 text-[#14B8A6] border border-[#14B8A6]/30' : 'bg-amber-500/20 text-amber-300 border border-amber-400/30'}`}>
+            {isOnline ? <Wifi className="w-5 h-5" /> : <WifiOff className="w-5 h-5" />}
+          </div>
           <div>
-            <div className="text-xs font-bold text-slate-900">
-              {isOnline ? 'Online — Live Maps, Weather & Sync Active' : 'Offline Mode — Accessing Cached Itineraries'}
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#14B8A6] block">
+              Travel Vault &amp; Offline Sync
+            </span>
+            <div className="font-display text-base sm:text-lg font-black text-white">
+              {isOnline ? 'Online — Live Maps, Weather & Cloud Sync Active' : 'Offline Mode — Accessing Cached Itineraries'}
             </div>
-            <div className="text-[11px] text-slate-600">
-              Live maps, weather forecasts, online booking links, and Gemini AI require internet connectivity. Downloaded itineraries remain accessible offline.
+            <div className="text-xs text-slate-300 mt-0.5">
+              Store private travel documents, emergency contacts, and offline IndexedDB itineraries for zero-connectivity zones.
             </div>
           </div>
         </div>
         {itinerary && (
           <button
             onClick={handleDownloadOffline}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 cursor-pointer shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-gradient text-white text-xs font-bold shadow-md cursor-pointer shrink-0"
           >
-            <Download className="w-3.5 h-3.5" /> Save Current Trip Offline
+            <Download className="w-4 h-4" /> Save Current Trip Offline
           </button>
         )}
       </div>

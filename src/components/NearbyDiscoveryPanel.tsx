@@ -90,17 +90,17 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
   return (
     <div className="space-y-6">
       {/* Header & Filters */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+      <div className="bg-white rounded-3xl border border-[#E8EAF2] overflow-hidden shadow-[0_10px_35px_-10px_rgba(16,24,40,0.06)]">
+        <div className="bg-hero-midnight text-white p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-1">
+            <div className="flex items-center gap-2 text-[#14B8A6] text-xs font-extrabold uppercase tracking-wider mb-1">
               <Compass className="w-4 h-4" />
-              Nearby Discovery, Hotels & Dining
+              <span>Nearby Discovery, Stays &amp; Dining</span>
             </div>
-            <h2 className="font-display text-xl font-extrabold text-slate-900">
+            <h2 className="font-display text-xl sm:text-2xl font-black text-white tracking-tight">
               Around {centerLocation.name.split(',')[0]}
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-300 mt-1 max-w-2xl">
               Real-world places via Google Places API (New) near ({centerLocation.latitude.toFixed(4)}, {centerLocation.longitude.toFixed(4)}). External booking/delivery links open third-party sites and do not confirm live availability.
             </p>
           </div>
@@ -108,13 +108,14 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
           <button
             onClick={fetchNearby}
             disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition cursor-pointer shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-gradient text-white text-xs font-bold shadow-md transition cursor-pointer shrink-0"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh Nearby
+            <span>Refresh Nearby</span>
           </button>
         </div>
 
+        <div className="p-5 sm:p-6">
         {/* Category Pills */}
         <div className="flex flex-wrap gap-2 mb-4">
           {NEARBY_PRESETS.map((preset) => {
@@ -124,13 +125,13 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
               <button
                 key={preset.id}
                 onClick={() => setSelectedType(preset.id)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold transition cursor-pointer border ${
                   active
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? 'bg-[#101828] text-white border-[#101828] shadow-sm'
+                    : 'bg-[#F7F8FC] text-[#64748B] border-[#E8EAF2] hover:text-[#101828] hover:bg-white'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className={`w-3.5 h-3.5 ${active ? 'text-[#14B8A6]' : 'text-[#5145E5]'}`} />
                 {preset.label}
               </button>
             );
@@ -138,7 +139,7 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
         </div>
 
         {/* Distance, Rating, Open Now Filters */}
-        <div className="flex flex-wrap items-center gap-4 pt-3 border-t border-slate-100 text-xs">
+        <div className="flex flex-wrap items-center gap-4 pt-3.5 border-t border-[#E8EAF2] text-xs">
           <div className="flex items-center gap-2 text-slate-600 font-semibold">
             <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
             Filters:
@@ -183,9 +184,10 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
             <span>Open Now Only</span>
           </label>
 
-          <span className="ml-auto text-slate-500 font-medium">
+          <span className="ml-auto text-[#64748B] font-bold">
             {places.length} {places.length === 1 ? 'place' : 'places'} found
           </span>
+        </div>
         </div>
       </div>
 

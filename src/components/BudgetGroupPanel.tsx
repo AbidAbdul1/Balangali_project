@@ -258,54 +258,58 @@ export const BudgetGroupPanel: React.FC<BudgetGroupPanelProps> = ({
     <div className="space-y-6">
       {/* Top Budget Summary KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-          <div className="text-xs font-semibold text-slate-500">Estimated Total Budget</div>
-          <div className="font-display text-2xl font-extrabold text-slate-900 mt-1">
+        <div className="bg-hero-midnight text-white rounded-3xl p-5 shadow-lg">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#14B8A6]">
+            Estimated Total Budget
+          </div>
+          <div className="font-display text-2xl sm:text-3xl font-black text-white mt-1 font-mono">
             ₹{estimatedBudget.toLocaleString()}
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
+          <div className="text-[11px] text-slate-300 mt-1 font-mono">
             ₹{Math.round(estimatedBudget / durationDays).toLocaleString()}/day · ₹{Math.round(estimatedBudget / Math.max(1, travelersCount)).toLocaleString()}/person
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-          <div className="text-xs font-semibold text-slate-500">Actual Recorded Spend</div>
-          <div className="font-display text-2xl font-extrabold text-indigo-600 mt-1">
+        <div className="bg-white rounded-3xl border border-[#E8EAF2] p-5 shadow-xs">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
+            Actual Recorded Spend
+          </div>
+          <div className="font-display text-2xl sm:text-3xl font-black text-[#5145E5] mt-1 font-mono">
             ₹{totalSpent.toLocaleString()}
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">{expenses.length} logged expense(s)</div>
+          <div className="text-[11px] text-[#64748B] mt-1">{expenses.length} logged expense(s)</div>
         </div>
 
-        <div className={`rounded-2xl border p-4 shadow-xs ${isOverBudget ? 'bg-rose-50 border-rose-200' : 'bg-emerald-50 border-emerald-200'}`}>
-          <div className="flex items-center justify-between text-xs font-semibold">
+        <div className={`rounded-3xl border p-5 shadow-xs ${isOverBudget ? 'bg-rose-50 border-rose-200' : 'bg-emerald-50/70 border-emerald-200'}`}>
+          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider">
             <span className={isOverBudget ? 'text-rose-700' : 'text-emerald-700'}>Remaining Budget</span>
             {isOverBudget ? <AlertTriangle className="w-4 h-4 text-rose-600" /> : <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
           </div>
-          <div className={`font-display text-2xl font-extrabold mt-1 ${isOverBudget ? 'text-rose-700' : 'text-emerald-700'}`}>
+          <div className={`font-display text-2xl sm:text-3xl font-black mt-1 font-mono ${isOverBudget ? 'text-rose-700' : 'text-emerald-700'}`}>
             ₹{remainingBudget.toLocaleString()}
           </div>
-          <div className="text-[11px] text-slate-600 mt-1">
+          <div className="text-[11px] text-[#64748B] mt-1">
             {isOverBudget ? 'Over budget — run AI Cost Optimizer below' : 'Within planned trip budget'}
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+        <div className="bg-white rounded-3xl border border-[#E8EAF2] p-5 shadow-xs">
+          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
             <span>Currency Converter</span>
             <select
               value={targetCurrency}
               onChange={(e) => setTargetCurrency(e.target.value)}
-              className="px-1.5 py-0.5 rounded-md border border-slate-200 text-xs font-bold text-slate-800"
+              className="px-2 py-0.5 rounded-lg border border-[#E8EAF2] bg-[#F7F8FC] text-xs font-bold text-[#101828]"
             >
               {['USD', 'EUR', 'GBP', 'JPY', 'AED', 'SGD', 'THB'].map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </div>
-          <div className="font-display text-2xl font-extrabold text-slate-900 mt-1">
+          <div className="font-display text-2xl sm:text-3xl font-black text-[#101828] mt-1 font-mono">
             {rate > 0 ? `${(estimatedBudget * rate).toFixed(2)} ${targetCurrency}` : '—'}
           </div>
-          <div className="text-[10px] text-slate-400 mt-1">
+          <div className="text-[10px] text-[#64748B] mt-1">
             Rate date: {ratesData?.conversionDate || 'N/A'} ({ratesData?.source || 'loading'})
           </div>
         </div>

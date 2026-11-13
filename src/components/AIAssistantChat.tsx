@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { AssistantMessage, Destination } from '../types/travel';
-import { Send, Sparkles, User, Bot, AlertCircle, MapPin, RefreshCw } from 'lucide-react';
+import { AssistantMessage } from '../types/travel';
+import { Send, Sparkles, User, Bot, RefreshCw, Compass, MapPin } from 'lucide-react';
 
 interface AIAssistantChatProps {
   onSelectDestinationByName?: (name: string) => void;
@@ -9,10 +9,10 @@ interface AIAssistantChatProps {
 
 const STARTER_PROMPTS = [
   'How much does travel cost by Uber vs Rapido across my route?',
-  'What are the dress codes and darshan timings for Kanakadurga Temple?',
-  'How do I reach Undavalli Caves and what are the ticket prices?',
-  'Suggest the best street food spots and Andhra thali meals.',
-  'How should I plan a 2-day itinerary starting from my current location?',
+  'Plan a 3-day cultural & food itinerary from my origin.',
+  'What are the best sunset viewpoints and entry timings?',
+  'Suggest budget-friendly local food spots and iconic dishes.',
+  'How should I adjust my itinerary if rain is forecast this afternoon?',
 ];
 
 export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
@@ -23,7 +23,7 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
     {
       id: 'welcome',
       sender: 'assistant',
-      text: "Namaskaram & Welcome! I am your AI-TRAVELMATE Assistant. I provide verified facts, entrance fee calculations, Uber/Rapido transit estimates, and route recommendations for trips in India and worldwide. How can I assist your journey today?",
+      text: 'Welcome to AI-TRAVELMATE Concierge! I am grounded with your active trip context, live weather forecasts, admission fees, and multi-modal transit estimates. Ask me anything to plan, refine, or optimize your journey.',
       timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -56,7 +56,7 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
-          tripContext: tripContextSummary || 'Vijayawada travel exploration',
+          tripContext: tripContextSummary || 'Worldwide travel exploration',
         }),
       });
 
@@ -67,7 +67,10 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
           id: `bot-${Date.now()}`,
           sender: 'assistant',
           text: data.reply,
-          timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          timestamp: new Date().toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
           groundedDestinations: data.groundedDestinations,
         };
         setMessages((prev) => [...prev, assistantMsg]);
@@ -79,7 +82,7 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
       const errorMsg: AssistantMessage = {
         id: `err-${Date.now()}`,
         sender: 'assistant',
-        text: "I am temporarily experiencing connection latency with the Gemini service. You can continue using the destination search, interactive map, Open-Meteo weather intelligence, and itinerary builder directly.",
+        text: 'I am temporarily experiencing connection latency with the Gemini service. You can continue using destination search, interactive routing, live weather forecasts, and the trip planner directly.',
         timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -89,63 +92,73 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.04)] flex flex-col h-[650px] overflow-hidden">
-      {/* Header */}
-      <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-slate-950 text-white flex items-center justify-center shadow-xs">
-            <Sparkles className="w-4 h-4 text-amber-400" />
+    <div className="bg-white rounded-3xl border border-[#E8EAF2] shadow-[0_12px_40px_-12px_rgba(16,24,40,0.08)] flex flex-col h-[680px] overflow-hidden">
+      {/* Midnight Navy & Electric Violet AI Concierge Header */}
+      <div className="bg-hero-midnight text-white p-5 sm:p-6 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-brand-gradient text-white flex items-center justify-center shadow-lg shadow-[#5145E5]/30 shrink-0">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-display text-sm font-extrabold text-slate-900 leading-tight">
-              AI Travel Concierge & Route Advisor
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#14B8A6]">
+                Intelligent Travel Companion
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6] animate-pulse" />
+            </div>
+            <h3 className="font-display text-base sm:text-lg font-black text-white leading-tight">
+              AI Travel Advisor &amp; Route Concierge
             </h3>
-            <p className="text-[11px] text-slate-500">
-              Grounded with live coordinates, entry tickets & real-time weather
+            <p className="text-xs text-slate-300 mt-0.5">
+              Grounded with live coordinates, entry tickets &amp; real-time weather
             </p>
           </div>
         </div>
-        <span className="text-[11px] font-mono text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+        <span className="hidden sm:inline-flex text-[11px] font-mono font-bold text-white/90 bg-white/10 px-3 py-1 rounded-full border border-white/15">
           Gemini 3.8 Flash
         </span>
       </div>
 
       {/* Message Stream */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-slate-50/50">
+      <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#F7F8FC]">
         {messages.map((msg) => {
           const isUser = msg.sender === 'user';
           return (
             <div
               key={msg.id}
-              className={`flex gap-2.5 max-w-[85%] ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
+              className={`flex gap-3 max-w-[88%] sm:max-w-[80%] ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'
+                }`}
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-semibold ${
-                  isUser ? 'bg-slate-900 text-white' : 'bg-indigo-600 text-white'
-                }`}
+                className={`w-8 h-8 rounded-2xl flex items-center justify-center shrink-0 text-xs font-bold shadow-xs ${isUser ? 'bg-[#101828] text-white' : 'bg-brand-gradient text-white'
+                  }`}
               >
-                {isUser ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
+                {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
               </div>
 
               <div
-                className={`p-3.5 rounded-xl text-xs leading-relaxed ${
-                  isUser
-                    ? 'bg-slate-900 text-white rounded-tr-none'
-                    : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-2xs'
-                }`}
+                className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${isUser
+                    ? 'bg-[#101828] text-white rounded-tr-xs shadow-md'
+                    : 'bg-white border border-[#E8EAF2] text-[#101828] rounded-tl-xs shadow-xs'
+                  }`}
               >
                 <div className="whitespace-pre-line">{msg.text}</div>
 
                 {/* Grounded destination pills if any */}
                 {msg.groundedDestinations && msg.groundedDestinations.length > 0 && (
-                  <div className="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap gap-1 items-center">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Mentioned:</span>
+                  <div className="mt-3 pt-2.5 border-t border-[#E8EAF2] flex flex-wrap gap-1.5 items-center">
+                    <span className="text-[10px] text-[#64748B] font-bold uppercase flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-[#5145E5]" />
+                      <span>Explore Mentioned:</span>
+                    </span>
                     {msg.groundedDestinations.map((dName, i) => (
                       <button
                         key={i}
                         type="button"
-                        onClick={() => onSelectDestinationByName && onSelectDestinationByName(dName)}
-                        className="text-[10px] text-indigo-700 hover:text-indigo-900 underline font-medium"
+                        onClick={() =>
+                          onSelectDestinationByName && onSelectDestinationByName(dName)
+                        }
+                        className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#5145E5]/10 text-[#5145E5] hover:bg-[#5145E5] hover:text-white font-bold transition-colors cursor-pointer"
                       >
                         {dName}
                       </button>
@@ -154,9 +167,8 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
                 )}
 
                 <div
-                  className={`text-[9px] mt-1.5 font-mono text-right ${
-                    isUser ? 'text-slate-400' : 'text-slate-400'
-                  }`}
+                  className={`text-[10px] mt-2 font-mono text-right ${isUser ? 'text-slate-400' : 'text-[#64748B]'
+                    }`}
                 >
                   {msg.timestamp}
                 </div>
@@ -166,13 +178,13 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
         })}
 
         {isLoading && (
-          <div className="flex gap-2.5 max-w-[85%] mr-auto">
-            <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0">
-              <Bot className="w-3.5 h-3.5" />
+          <div className="flex gap-3 max-w-[80%] mr-auto">
+            <div className="w-8 h-8 rounded-2xl bg-brand-gradient text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Bot className="w-4 h-4" />
             </div>
-            <div className="p-3.5 bg-white border border-slate-200 rounded-xl rounded-tl-none text-xs text-slate-500 flex items-center gap-2 shadow-2xs">
-              <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-600" />
-              <span>Synthesizing travel guidance...</span>
+            <div className="p-4 bg-white border border-[#E8EAF2] rounded-2xl rounded-tl-xs text-xs text-[#101828] flex items-center gap-2.5 shadow-xs">
+              <RefreshCw className="w-4 h-4 animate-spin text-[#5145E5]" />
+              <span className="font-semibold">Synthesizing personalized travel guidance...</span>
             </div>
           </div>
         )}
@@ -180,18 +192,19 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested Starters */}
-      <div className="px-3 pt-2 pb-1 border-t border-slate-100 bg-white">
-        <span className="text-[10px] uppercase font-semibold text-slate-400 block mb-1">
-          Suggested Questions
+      {/* Suggested Starter Prompts */}
+      <div className="px-4 pt-3 pb-2 border-t border-[#E8EAF2] bg-white">
+        <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#64748B] flex items-center gap-1.5 mb-2">
+          <Compass className="w-3 h-3 text-[#5145E5]" />
+          <span>Suggested Travel Prompts</span>
         </span>
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex gap-2 overflow-x-auto pb-1.5 scrollbar-none">
           {STARTER_PROMPTS.map((prompt, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => handleSendMessage(prompt)}
-              className="text-[11px] whitespace-nowrap bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 transition-colors"
+              className="text-xs font-semibold whitespace-nowrap bg-[#F7F8FC] hover:bg-[#5145E5]/10 hover:text-[#5145E5] hover:border-[#5145E5]/30 border border-[#E8EAF2] rounded-xl px-3 py-1.5 text-[#101828] transition-all cursor-pointer"
             >
               {prompt}
             </button>
@@ -205,20 +218,21 @@ export const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
           e.preventDefault();
           handleSendMessage();
         }}
-        className="p-3 bg-white border-t border-slate-100 flex items-center gap-2"
+        className="p-4 bg-white border-t border-[#E8EAF2] flex items-center gap-2.5"
       >
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Ask about destinations, local food, timings, weather..."
-          className="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="Ask about destinations, local cuisine, timings, weather, or routes..."
+          className="flex-1 bg-[#F7F8FC] border border-[#E8EAF2] rounded-2xl px-4 py-3 text-xs sm:text-sm text-[#101828] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#5145E5]/20 focus:border-[#5145E5] focus:bg-white transition-all"
         />
         <button
           type="submit"
           disabled={!inputText.trim() || isLoading}
-          className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white rounded-lg transition-colors flex items-center justify-center shadow-xs"
+          className="px-5 py-3 bg-brand-gradient disabled:opacity-40 text-white rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-md shadow-[#5145E5]/25 cursor-pointer"
         >
+          <span>Send</span>
           <Send className="w-3.5 h-3.5" />
         </button>
       </form>

@@ -1,6 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Wallet, Shirt, FileText, Globe2, Coins, BarChart2, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import {
+  Wallet,
+  Shirt,
+  FileText,
+  Globe2,
+  Coins,
+  BarChart2,
+  SlidersHorizontal,
+  X,
+  Check,
+  ChevronRight,
+} from 'lucide-react';
 import { useLanguage, CurrencyCode } from '../context/LanguageContext';
 import { SUPPORTED_LANGUAGES } from '../i18n/translations';
 import { NavTab } from './Navbar';
@@ -29,186 +40,246 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
   onOpenDiagnostics,
 }) => {
   const { language, setLanguage, currency, setCurrency } = useLanguage();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [openMenu, setOpenMenu] = useState<'lang' | 'curr' | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [subMenu, setSubMenu] = useState<'lang' | 'curr' | null>(null);
   const dockRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onOutside = (e: MouseEvent) => {
       if (dockRef.current && !dockRef.current.contains(e.target as Node)) {
-        setOpenMenu(null);
+        setIsOpen(false);
+        setSubMenu(null);
       }
     };
     document.addEventListener('mousedown', onOutside);
     return () => document.removeEventListener('mousedown', onOutside);
   }, []);
 
-  const currentLangObj = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
+  const currentLangObj =
+    SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   return (
-    <div ref={dockRef} className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2 no-print">
+    <div ref={dockRef} className="fixed bottom-5 right-5 z-40 flex flex-col items-end no-print">
       <AnimatePresence>
-        {!isCollapsed && (
+        {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 14, scale: 0.95 }}
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 14, scale: 0.95 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-end gap-2"
+            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-3 w-72 bg-white/98 backdrop-blur-2xl rounded-3xl border border-[#E8EAF2] shadow-[0_24px_48px_-12px_rgba(16,24,40,0.18)] p-3.5 overflow-hidden"
           >
-            {/* 1. Budget & Group */}
-            <button
-              type="button"
-              onClick={() => onSelectTab('budget')}
-              className={`flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold shadow-md border backdrop-blur-xl transition-all hover:-translate-x-1 cursor-pointer ${
-                activeTab === 'budget'
-                  ? 'bg-slate-950 text-white border-slate-900 shadow-slate-950/20'
-                  : 'bg-white/95 text-slate-800 border-slate-200/90 hover:bg-slate-50 hover:border-slate-300'
-              }`}
-              title="Open Budget & Group Expense Manager"
-            >
-              <div className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                <Wallet className="w-3.5 h-3.5" />
+            <div className="flex items-center justify-between px-2 pb-2.5 mb-2 border-b border-[#E8EAF2]">
+              <div>
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#5145E5] block">
+                  Travel Utilities
+                </span>
+                <span className="text-xs font-bold text-[#101828]">
+                  Quick Actions &amp; Preferences
+                </span>
               </div>
-              <span>Budget &amp; Group</span>
-            </button>
-
-            {/* 2. Packing */}
-            <button
-              type="button"
-              onClick={onOpenPackingList}
-              className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
-              title="Open Smart Packing Checklist"
-            >
-              <div className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                <Shirt className="w-3.5 h-3.5" />
-              </div>
-              <span>Packing</span>
-            </button>
-
-            {/* 3. Export PDF */}
-            <button
-              type="button"
-              onClick={onOpenExportSheet}
-              className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
-              title="Export PDF / Offline Travel Sheet"
-            >
-              <div className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                <FileText className="w-3.5 h-3.5" />
-              </div>
-              <span>Export PDF</span>
-            </button>
-
-            {/* 4. Language Selector */}
-            <div className="relative">
               <button
                 type="button"
-                onClick={() => setOpenMenu(openMenu === 'lang' ? null : 'lang')}
-                className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
-                title="Change Language"
+                onClick={() => {
+                  setIsOpen(false);
+                  setSubMenu(null);
+                }}
+                className="p-1.5 rounded-xl text-[#64748B] hover:text-[#101828] hover:bg-[#F7F8FC] cursor-pointer"
               >
-                <div className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                  <Globe2 className="w-3.5 h-3.5" />
-                </div>
-                <span>{currentLangObj.flag} {currentLangObj.nativeName}</span>
+                <X className="w-4 h-4" />
               </button>
-
-              {openMenu === 'lang' && (
-                <div className="absolute right-full bottom-0 mr-2 w-48 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                    Select Language
-                  </div>
-                  {SUPPORTED_LANGUAGES.map((lang) => (
-                    <button
-                      key={lang.code}
-                      type="button"
-                      onClick={() => {
-                        setLanguage(lang.code);
-                        setOpenMenu(null);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                        language === lang.code ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span>{lang.flag}</span>
-                        <span>{lang.nativeName}</span>
-                      </span>
-                      {language === lang.code && <Check className="w-3.5 h-3.5 text-indigo-600" />}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
-            {/* 5. Currency Selector */}
-            <div className="relative">
+            <div className="space-y-1">
+              {/* 1. Budget & Group */}
               <button
                 type="button"
-                onClick={() => setOpenMenu(openMenu === 'curr' ? null : 'curr')}
-                className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
-                title="Change Display Currency"
+                onClick={() => {
+                  onSelectTab('budget');
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+                  activeTab === 'budget'
+                    ? 'bg-brand-gradient text-white shadow-sm'
+                    : 'text-[#101828] hover:bg-[#F7F8FC]'
+                }`}
               >
-                <div className="w-5 h-5 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                  <Coins className="w-3.5 h-3.5" />
-                </div>
-                <span>{currency}</span>
+                <span className="flex items-center gap-2.5">
+                  <span
+                    className={`w-7 h-7 rounded-xl flex items-center justify-center ${
+                      activeTab === 'budget'
+                        ? 'bg-white/20 text-white'
+                        : 'bg-[#14B8A6]/10 text-[#14B8A6]'
+                    }`}
+                  >
+                    <Wallet className="w-3.5 h-3.5" />
+                  </span>
+                  <span>Budget &amp; Group Split</span>
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 opacity-60" />
               </button>
 
-              {openMenu === 'curr' && (
-                <div className="absolute right-full bottom-0 mr-2 w-40 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                    Currency
-                  </div>
-                  {CURRENCIES.map((c) => (
-                    <button
-                      key={c.code}
-                      type="button"
-                      onClick={() => {
-                        setCurrency(c.code);
-                        setOpenMenu(null);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                        currency === c.code ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      <span>{c.label}</span>
-                      {currency === c.code && <Check className="w-3.5 h-3.5 text-indigo-600" />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+              {/* 2. Packing Checklist */}
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenPackingList();
+                  setIsOpen(false);
+                }}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold text-[#101828] hover:bg-[#F7F8FC] transition-all cursor-pointer"
+              >
+                <span className="flex items-center gap-2.5">
+                  <span className="w-7 h-7 rounded-xl bg-[#5145E5]/10 text-[#5145E5] flex items-center justify-center">
+                    <Shirt className="w-3.5 h-3.5" />
+                  </span>
+                  <span>Smart Packing Checklist</span>
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#64748B]" />
+              </button>
 
-            {/* 6. Diagnostics */}
-            <button
-              type="button"
-              onClick={onOpenDiagnostics}
-              className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
-              title="Open System &amp; Model Diagnostics"
-            >
-              <div className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                <BarChart2 className="w-3.5 h-3.5" />
+              {/* 3. Export PDF */}
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenExportSheet();
+                  setIsOpen(false);
+                }}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold text-[#101828] hover:bg-[#F7F8FC] transition-all cursor-pointer"
+              >
+                <span className="flex items-center gap-2.5">
+                  <span className="w-7 h-7 rounded-xl bg-[#8067F5]/10 text-[#8067F5] flex items-center justify-center">
+                    <FileText className="w-3.5 h-3.5" />
+                  </span>
+                  <span>Export PDF Travel Sheet</span>
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#64748B]" />
+              </button>
+
+              {/* 4. Language Selector */}
+              <div className="pt-1 border-t border-[#E8EAF2]">
+                <button
+                  type="button"
+                  onClick={() => setSubMenu(subMenu === 'lang' ? null : 'lang')}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold text-[#101828] hover:bg-[#F7F8FC] transition-all cursor-pointer"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <span className="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center">
+                      <Globe2 className="w-3.5 h-3.5" />
+                    </span>
+                    <span>Language</span>
+                  </span>
+                  <span className="text-[11px] font-semibold text-[#5145E5] bg-[#5145E5]/10 px-2 py-0.5 rounded-lg">
+                    {currentLangObj.flag} {currentLangObj.nativeName}
+                  </span>
+                </button>
+
+                {subMenu === 'lang' && (
+                  <div className="mt-1 p-1.5 bg-[#F7F8FC] rounded-2xl border border-[#E8EAF2] grid grid-cols-2 gap-1">
+                    {SUPPORTED_LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => {
+                          setLanguage(lang.code);
+                          setSubMenu(null);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-xl text-[11px] flex items-center justify-between transition-colors cursor-pointer ${
+                          language === lang.code
+                            ? 'bg-[#5145E5] text-white font-bold'
+                            : 'text-[#101828] hover:bg-white'
+                        }`}
+                      >
+                        <span className="truncate">
+                          {lang.flag} {lang.nativeName}
+                        </span>
+                        {language === lang.code && <Check className="w-3 h-3 shrink-0" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              <span>Diagnostics</span>
-            </button>
+
+              {/* 5. Currency Selector */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setSubMenu(subMenu === 'curr' ? null : 'curr')}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold text-[#101828] hover:bg-[#F7F8FC] transition-all cursor-pointer"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <span className="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                      <Coins className="w-3.5 h-3.5" />
+                    </span>
+                    <span>Currency</span>
+                  </span>
+                  <span className="text-[11px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/60">
+                    {currency}
+                  </span>
+                </button>
+
+                {subMenu === 'curr' && (
+                  <div className="mt-1 p-1.5 bg-[#F7F8FC] rounded-2xl border border-[#E8EAF2] flex flex-wrap gap-1">
+                    {CURRENCIES.map((c) => (
+                      <button
+                        key={c.code}
+                        type="button"
+                        onClick={() => {
+                          setCurrency(c.code);
+                          setSubMenu(null);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-xl text-[11px] font-mono flex items-center gap-1 transition-colors cursor-pointer ${
+                          currency === c.code
+                            ? 'bg-[#5145E5] text-white font-bold'
+                            : 'bg-white text-[#101828] hover:bg-slate-100 border border-[#E8EAF2]'
+                        }`}
+                      >
+                        <span>{c.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 6. Diagnostics */}
+              <div className="pt-1 border-t border-[#E8EAF2]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenDiagnostics();
+                    setIsOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-bold text-[#101828] hover:bg-[#F7F8FC] transition-all cursor-pointer"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <span className="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                      <BarChart2 className="w-3.5 h-3.5" />
+                    </span>
+                    <span>System Diagnostics</span>
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-[#64748B]" />
+                </button>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Collapse / Expand Toggle Pill */}
+      {/* Compact Utility Pill Button */}
       <button
         type="button"
         onClick={() => {
-          setIsCollapsed((v) => !v);
-          setOpenMenu(null);
+          setIsOpen((v) => !v);
+          setSubMenu(null);
         }}
-        className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold bg-slate-950 text-white shadow-xl ring-1 ring-white/10 hover:bg-slate-900 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+        className="flex items-center gap-2.5 px-4 py-2.5 rounded-full text-xs font-bold bg-[#101828] text-white shadow-[0_12px_30px_-4px_rgba(16,24,40,0.4)] ring-1 ring-white/15 hover:bg-[#1E293B] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+        title="Open Travel Utilities, Packing, Export, Currency & Language"
       >
-        {isCollapsed ? <ChevronUp className="w-3.5 h-3.5 text-indigo-400" /> : <ChevronDown className="w-3.5 h-3.5 text-indigo-400" />}
-        <span>{isCollapsed ? 'Quick Tools' : 'Hide'}</span>
+        <SlidersHorizontal className="w-3.5 h-3.5 text-[#14B8A6]" />
+        <span>Utilities</span>
+        <span className="text-[10px] font-mono bg-white/15 px-2 py-0.5 rounded-full text-white/90">
+          {currency} · {currentLangObj.code.toUpperCase()}
+        </span>
       </button>
     </div>
   );
 };
-

@@ -224,31 +224,34 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({
   ) / 100;
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-100/90">
+    <div className="bg-white rounded-3xl border border-[#E8EAF2] overflow-hidden shadow-[0_10px_35px_-10px_rgba(16,24,40,0.06)]">
+      <div className="bg-hero-midnight text-white p-5 sm:p-6 flex items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-base sm:text-lg font-black text-slate-950 tracking-tight">
-            Travel Preferences & Parameters
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#14B8A6] block mb-0.5">
+            AI Recommendation Engine
+          </span>
+          <h2 className="font-display text-base sm:text-lg font-black text-white tracking-tight">
+            Travel Preferences &amp; Scoring
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Configure your journey parameters to compute personalized recommendations anywhere worldwide
+          <p className="text-xs text-slate-300 mt-0.5">
+            Configure your interests, budget, and duration for transparent AI ranking
           </p>
         </div>
         <button
           onClick={() => setShowWeightSettings(!showWeightSettings)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full transition-all border cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl transition-all border cursor-pointer shrink-0 ${
             showWeightSettings
-              ? 'bg-slate-950 text-white border-slate-950 shadow-xs'
-              : 'bg-white text-slate-700 border-slate-200/80 hover:bg-slate-100'
+              ? 'bg-brand-gradient text-white border-transparent shadow-sm'
+              : 'bg-white/10 text-white border-white/15 hover:bg-white/20'
           }`}
           title="Customize transparent scoring formula weights (SRS FR-14)"
         >
           <Sliders className="w-3.5 h-3.5" />
-          <span>Formula Weights</span>
+          <span>Weights</span>
         </button>
       </div>
 
-      <div className="space-y-4 pt-4">
+      <div className="p-5 sm:p-6 space-y-4">
         {/* 1. Worldwide Starting Origin with Current Location Option */}
         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
           <div className="flex items-center justify-between flex-wrap gap-2">
@@ -651,16 +654,16 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({
             type="button"
             onClick={onSubmit}
             disabled={isLoading}
-            className="w-full py-3.5 px-4 bg-slate-950 hover:bg-slate-900 disabled:opacity-50 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md hover:shadow-xl transition-all hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-3.5 px-4 bg-brand-gradient disabled:opacity-50 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-[#5145E5]/25 transition-all hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
             {isLoading ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
+                <RefreshCw className="w-4 h-4 animate-spin text-white" />
                 Computing Recommendations &amp; Routes...
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-amber-300" />
+                <Sparkles className="w-4 h-4 text-white" />
                 Calculate Personalized Recommendations
               </>
             )}

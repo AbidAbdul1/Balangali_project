@@ -107,25 +107,25 @@ Plan generated with AI-TRAVELMATE`;
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.04)] overflow-hidden">
-      {/* Header Banner - Sleek Dark Slate */}
-      <div className="bg-slate-950 text-white p-5 sm:p-6">
+    <div className="bg-white rounded-3xl border border-[#E8EAF2] shadow-[0_10px_35px_-10px_rgba(16,24,40,0.06)] overflow-hidden">
+      {/* Header Banner - Deep Midnight Navy */}
+      <div className="bg-hero-midnight text-white p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="p-1 rounded-lg bg-indigo-500/20 text-indigo-400">
+              <span className="p-1.5 rounded-xl bg-brand-gradient text-white shadow-sm">
                 <Sparkles className="w-4 h-4" />
               </span>
               <h3 className="font-display text-base sm:text-lg font-extrabold text-white tracking-tight">
                 {t('costEstimationTitle', 'AI Trip Cost Intelligence')}
               </h3>
               {isAiGenerated && (
-                <span className="text-[10px] uppercase font-bold tracking-wider bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-400/30">
+                <span className="text-[10px] uppercase font-bold tracking-wider bg-[#14B8A6]/20 text-[#14B8A6] px-2.5 py-0.5 rounded-full border border-[#14B8A6]/30">
                   Gemini Verified
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400 mt-1 max-w-xl">
+            <p className="text-xs text-slate-300 mt-1 max-w-xl">
               {t('costEstimationSubtitle', 'Granular breakdown of Entrance Tickets, Transit, Food & Dining, Accommodation, and Buffer.')}
             </p>
           </div>

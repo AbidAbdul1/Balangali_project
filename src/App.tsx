@@ -783,9 +783,10 @@ export default function App() {
   ];
 
   const itemsInPlanCount = itinerary ? itinerary.days.reduce((acc, d) => acc + d.items.length, 0) : 0;
+  const plannedDestinations = itinerary ? itinerary.days.flatMap((d) => d.items.map((it) => it.destination)) : [];
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[#fafaf8] flex flex-col text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#F7F8FC] flex flex-col text-[#101828] selection:bg-[#5145E5]/15 selection:text-[#5145E5]">
       {/* Fixed Top Horizontal Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -807,16 +808,16 @@ export default function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-6 left-6 z-50 bg-slate-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-xl shadow-xl border border-slate-700/80 text-xs flex items-center gap-2"
+            className="fixed bottom-6 left-6 z-50 bg-[#101828]/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl border border-white/15 text-xs font-medium flex items-center gap-2.5"
           >
-            <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+            <CheckCircle className="w-4 h-4 text-[#14B8A6] shrink-0" />
             <span>{toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Step-by-Step Location & Destination Selection Workflow Header */}
         <TripWorkflowHeader
           startingLocation={preferences.startingLocation}
@@ -833,6 +834,13 @@ export default function App() {
           onUpdateBudgetAmount={handleUpdateCustomBudget}
           onClearItinerary={handleClearItinerary}
           onAutoFillPlan={handleAutoFillItinerary}
+          travelersCount={travelersCount}
+          onUpdateTravelersCount={(count) => {
+            setTravelersCount(count);
+            fetchCostEstimation(undefined, undefined, { travelersCount: count });
+          }}
+          selectedDestinations={plannedDestinations}
+          onRemoveDestination={(dest) => handleAddToItinerary(dest)}
         />
 
         <AnimatePresence mode="wait">
@@ -856,28 +864,31 @@ export default function App() {
             ) : (
               <>
                 {/* Active Destination Top Bar */}
-                <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white flex items-center justify-center font-bold text-sm shadow-md ring-1 ring-white/10 shrink-0">
-                      <MapPin className="w-5 h-5 text-indigo-300" />
+                <div className="bg-hero-midnight text-white rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_16px_40px_-12px_rgba(16,24,40,0.25)]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-gradient text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#5145E5]/30 shrink-0">
+                      <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-widest bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200/70">
+                        <span className="text-[10px] font-extrabold text-[#14B8A6] uppercase tracking-widest bg-[#14B8A6]/15 px-2.5 py-0.5 rounded-full border border-[#14B8A6]/30">
                           Active Circuit
                         </span>
-                        <span className="text-xs text-slate-500 font-medium">
+                        <span className="text-xs text-slate-300 font-medium">
                           {destinations.length} popular spots loaded
                         </span>
                       </div>
-                      <h2 className="text-xl font-black text-slate-950 flex items-center gap-2 mt-0.5">
+                      <h2 className="font-display text-xl sm:text-2xl font-black text-white flex items-center gap-2 mt-0.5">
                         <span>{selectedRegion.name}</span>
-                        <span className="text-xs font-normal text-slate-500">· {selectedRegion.state}, {selectedRegion.country}</span>
+                        <span className="text-xs font-normal text-slate-300">
+                          · {selectedRegion.state}
+                          {selectedRegion.country ? `, ${selectedRegion.country}` : ''}
+                        </span>
                       </h2>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="flex items-center gap-2.5 w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={() => {
@@ -886,19 +897,19 @@ export default function App() {
                         setSelectedDestination(null);
                         setActiveRoute(null);
                       }}
-                      className="flex-1 sm:flex-initial px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200/80"
+                      className="flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-white/15"
                     >
-                      <Globe className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>Change Destination</span>
+                      <Globe className="w-3.5 h-3.5 text-[#14B8A6]" />
+                      <span>All Destinations</span>
                     </button>
                     {itemsInPlanCount > 0 && (
                       <button
                         type="button"
                         onClick={() => setActiveTab('itinerary')}
-                        className="flex-1 sm:flex-initial px-4 py-2 text-xs font-semibold text-white bg-slate-950 hover:bg-slate-900 rounded-full transition-all hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                        className="flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold text-white bg-brand-gradient rounded-xl transition-all hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
                       >
-                        <span>View Itinerary ({itemsInPlanCount})</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-indigo-300" />
+                        <span>View Trip Plan ({itemsInPlanCount})</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-white" />
                       </button>
                     )}
                   </div>
@@ -1276,32 +1287,34 @@ export default function App() {
               {/* Right Column: Recommendations Results */}
               <div className="lg:col-span-7 xl:col-span-8 space-y-4">
                 {recommendations.length === 0 ? (
-                  <div className="bg-white rounded-xl border border-slate-200 p-10 text-center shadow-xs">
-                    <Sparkles className="w-10 h-10 text-indigo-500 mx-auto mb-3" />
-                    <h3 className="text-base font-bold text-slate-900">
-                      Personalized Recommendation Engine
+                  <div className="bg-white rounded-3xl border border-[#E8EAF2] p-12 text-center shadow-[0_10px_35px_-10px_rgba(16,24,40,0.05)]">
+                    <div className="w-14 h-14 rounded-2xl bg-brand-gradient text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#5145E5]/25">
+                      <Sparkles className="w-7 h-7" />
+                    </div>
+                    <h3 className="font-display text-lg font-black text-[#101828]">
+                      AI Personalized Recommendation Engine
                     </h3>
-                    <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-5">
-                      Configure your travel interests, budget, and trip duration on the left, then click "Calculate Personalized Recommendations" to run the transparent weighted scoring algorithm.
+                    <p className="text-xs sm:text-sm text-[#64748B] max-w-md mx-auto mt-1.5 mb-6 leading-relaxed">
+                      Configure your travel interests, budget, and trip duration on the left, then click &ldquo;Calculate Personalized Recommendations&rdquo; to run our transparent weighted scoring algorithm.
                     </p>
                     <button
                       onClick={handleComputeRecommendations}
                       disabled={isComputingRecommendations}
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-sm cursor-pointer"
+                      className="px-6 py-3 bg-brand-gradient text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-[#5145E5]/25 cursor-pointer"
                     >
-                      Run Initial Recommendation Pass
+                      Run AI Recommendation Pass
                     </button>
                   </div>
                 ) : (
                   <>
                     {/* AI Executive Briefing */}
                     {recommendationBriefing && (
-                      <div className="p-4 bg-indigo-50/70 border border-indigo-200/80 rounded-xl space-y-1.5 text-xs text-indigo-950">
-                        <div className="flex items-center gap-2 font-bold text-indigo-900">
-                          <Sparkles className="w-4 h-4 text-indigo-600" />
+                      <div className="p-5 bg-hero-midnight text-white rounded-3xl space-y-2 text-xs shadow-lg">
+                        <div className="flex items-center gap-2 font-bold text-[#14B8A6] uppercase tracking-wider text-[11px]">
+                          <Sparkles className="w-4 h-4 text-[#14B8A6]" />
                           <span>AI Executive Travel Briefing (Gemini 3.8 Flash)</span>
                         </div>
-                        <p className="leading-relaxed whitespace-pre-line">{recommendationBriefing}</p>
+                        <p className="leading-relaxed whitespace-pre-line text-slate-200">{recommendationBriefing}</p>
                       </div>
                     )}
 
@@ -1515,20 +1528,22 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 mt-12 py-6 text-xs text-slate-500">
+      <footer className="bg-white border-t border-[#E8EAF2] mt-14 py-8 text-xs text-[#64748B]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-indigo-600" />
-            <span className="font-bold text-slate-900">AI-TRAVELMATE</span>
-            <span>· Intelligent Travel Planning System</span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-xl bg-brand-gradient text-white flex items-center justify-center shadow-xs">
+              <Compass className="w-4 h-4" />
+            </div>
+            <span className="font-display font-black text-[#101828] tracking-tight">AI-TRAVELMATE</span>
+            <span>· Intelligent Travel Discovery &amp; Planning Platform</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] text-slate-400">
-            <span>OpenStreetMap</span>
+          <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#64748B] font-medium">
+            <span>Google Places &amp; OpenStreetMap</span>
             <span>·</span>
-            <span>Open-Meteo (CC BY 4.0)</span>
+            <span>Open-Meteo Weather</span>
             <span>·</span>
-            <span>OSRM Project</span>
+            <span>OSRM Multi-Modal Routing</span>
             <span>·</span>
             <span>Gemini 3.8 Flash</span>
           </div>
