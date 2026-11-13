@@ -71,19 +71,19 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
   return (
     <div className="space-y-6">
       {/* Editorial Destination Showcase Hero Card */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-[0_4px_30px_-4px_rgba(15,23,42,0.04)]">
+      <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <div className="max-w-3xl">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
-              Manual Destination Selection
+            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600">
+              Worldwide Destination Explorer
             </span>
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+          <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight mt-1.5">
             Where would you like to travel?
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed max-w-2xl">
-            Choose a destination hub below to explore authentic places, live weather intelligence, and machine learning traffic speeds—or search any custom city worldwide.
+            Choose a curated destination hub below to explore authentic sights, live weather forecasts, and route traffic calculations—or search any custom city worldwide.
           </p>
         </div>
 
@@ -96,13 +96,13 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search any destination worldwide (e.g. Goa, Paris, Tokyo, Mumbai, Jaipur)..."
-              className="w-full bg-slate-50 border border-slate-200/90 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 transition-all placeholder:text-slate-400"
+              className="w-full bg-slate-50/80 border border-slate-200/90 rounded-2xl pl-10 pr-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-400"
             />
           </div>
           <button
             type="submit"
             disabled={isSearching}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+            className="px-5 py-2.5 bg-slate-950 hover:bg-slate-900 text-white rounded-2xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>{isSearching ? 'Discovering...' : 'Explore via AI'}</span>
@@ -110,15 +110,15 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
         </form>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 mt-6 pt-5 border-t border-slate-100 flex-wrap">
+        <div className="flex items-center gap-1.5 mt-6 pt-5 border-t border-slate-100/90 flex-wrap">
           <span className="text-xs font-semibold text-slate-400 mr-1">Filter Hubs:</span>
           <button
             type="button"
             onClick={() => setFilterType('all')}
-            className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer ${
               filterType === 'all'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-slate-950 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:text-slate-950 hover:bg-slate-200/70'
             }`}
           >
             All Destinations ({ALL_REGIONS.length})
@@ -126,10 +126,10 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
           <button
             type="button"
             onClick={() => setFilterType('india')}
-            className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer ${
               filterType === 'india'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-slate-950 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:text-slate-950 hover:bg-slate-200/70'
             }`}
           >
             India Circuits
@@ -137,10 +137,10 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
           <button
             type="button"
             onClick={() => setFilterType('international')}
-            className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer ${
               filterType === 'international'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-slate-950 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:text-slate-950 hover:bg-slate-200/70'
             }`}
           >
             International Hubs
@@ -160,7 +160,7 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
                 <div
                   key={region.id}
                   onClick={() => onSelectRegion(region)}
-                  className="group relative bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 overflow-hidden shadow-xs hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                  className="group relative bg-white rounded-2xl border border-slate-200/80 hover:border-slate-300 overflow-hidden shadow-xs hover:shadow-[0_16px_36px_-6px_rgba(15,23,42,0.08)] hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between"
                 >
                   <div className="relative h-44 w-full bg-slate-100 overflow-hidden">
                     <img
@@ -171,7 +171,7 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
 
-                    <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white border border-white/20 px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-semibold">
+                    <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white border border-white/20 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold">
                       {region.destinations.length} spots
                     </div>
 
@@ -180,7 +180,7 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
                         {region.state}
                         {region.country ? `, ${region.country}` : ''}
                       </div>
-                      <h4 className="font-display text-lg font-extrabold tracking-tight text-white leading-tight mt-0.5">
+                      <h4 className="font-display text-lg font-black tracking-tight text-white leading-tight mt-0.5">
                         {region.name}
                       </h4>
                     </div>
@@ -190,7 +190,7 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
                     <p className="text-[11px] text-slate-500 line-clamp-1 pr-2">
                       {region.tagline}
                     </p>
-                    <span className="text-xs font-semibold text-indigo-600 group-hover:text-indigo-800 shrink-0 flex items-center gap-0.5">
+                    <span className="text-xs font-semibold text-indigo-600 group-hover:text-indigo-800 shrink-0 flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
                       Explore <ChevronRight className="w-3.5 h-3.5" />
                     </span>
                   </div>

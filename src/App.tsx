@@ -856,21 +856,21 @@ export default function App() {
             ) : (
               <>
                 {/* Active Destination Top Bar */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_2px_12px_rgba(15,23,42,0.04)]">
+                <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                   <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
-                      <MapPin className="w-5 h-5 text-indigo-400" />
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white flex items-center justify-center font-bold text-sm shadow-md ring-1 ring-white/10 shrink-0">
+                      <MapPin className="w-5 h-5 text-indigo-300" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
-                          Active Destination
+                        <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-widest bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200/70">
+                          Active Circuit
                         </span>
                         <span className="text-xs text-slate-500 font-medium">
                           {destinations.length} popular spots loaded
                         </span>
                       </div>
-                      <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 mt-0.5">
+                      <h2 className="text-xl font-black text-slate-950 flex items-center gap-2 mt-0.5">
                         <span>{selectedRegion.name}</span>
                         <span className="text-xs font-normal text-slate-500">· {selectedRegion.state}, {selectedRegion.country}</span>
                       </h2>
@@ -886,7 +886,7 @@ export default function App() {
                         setSelectedDestination(null);
                         setActiveRoute(null);
                       }}
-                      className="flex-1 sm:flex-initial px-3.5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200"
+                      className="flex-1 sm:flex-initial px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200/80"
                     >
                       <Globe className="w-3.5 h-3.5 text-indigo-600" />
                       <span>Change Destination</span>
@@ -895,7 +895,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setActiveTab('itinerary')}
-                        className="flex-1 sm:flex-initial px-3.5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                        className="flex-1 sm:flex-initial px-4 py-2 text-xs font-semibold text-white bg-slate-950 hover:bg-slate-900 rounded-full transition-all hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
                       >
                         <span>View Itinerary ({itemsInPlanCount})</span>
                         <ArrowRight className="w-3.5 h-3.5 text-indigo-300" />
@@ -926,7 +926,7 @@ export default function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                   {/* Left Column: Interactive Map & Live Traffic Card (Sticky on Desktop) */}
                   <div className="lg:col-span-7 space-y-4 lg:sticky lg:top-20" id="interactive-map-section">
-                    <div className="h-[500px]">
+                    <div className="h-[500px] rounded-3xl overflow-hidden shadow-xs border border-slate-200/80">
                       <InteractiveMap
                         destinations={destinations}
                         selectedDestination={selectedDestination}
@@ -942,9 +942,9 @@ export default function App() {
                 </div>
 
                 {/* Vehicle Route Selector, Cost Reference & Direct Platform Navigation */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs space-y-3">
+                <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 p-4 sm:p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-extrabold text-slate-900">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                       Select Vehicle / Route Mode
                     </span>
                     {isRouteLoading && (
@@ -973,10 +973,10 @@ export default function App() {
                             handleCalculateRoute(target, undefined, m.id);
                           }
                         }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                           selectedRouteMode === m.id
-                            ? 'bg-slate-900 text-white shadow-xs'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                            ? 'bg-slate-950 text-white shadow-xs'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200/80'
                         }`}
                       >
                         {m.label}
@@ -985,7 +985,7 @@ export default function App() {
                   </div>
 
                   {activeRoute && (
-                    <div className="bg-slate-50 rounded-xl border border-slate-200 p-3 space-y-2 text-xs">
+                    <div className="bg-slate-50/80 rounded-2xl border border-slate-200/90 p-3.5 space-y-2 text-xs">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div>
                           <span className="font-bold text-slate-900">
@@ -997,11 +997,11 @@ export default function App() {
                             </span>
                           )}
                         </div>
-                        <span className="text-[11px] font-bold text-indigo-700">
+                        <span className="text-xs font-bold font-mono text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200/60">
                           {activeRoute.estimatedCostLabel || `Est. ₹${activeRoute.estimatedCostINR || 0}`}
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-[11px] text-slate-400 font-mono">
                         Source: {activeRoute.routingSource} · {activeRoute.trafficSource}
                       </div>
                       {activeRoute.platformLinks && activeRoute.platformLinks.length > 0 && (
@@ -1012,10 +1012,10 @@ export default function App() {
                               href={pl.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-800 font-semibold hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700 transition text-[11px]"
+                              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-semibold hover:border-indigo-400 hover:text-indigo-700 transition-all text-[11px] shadow-2xs hover:shadow-xs"
                             >
                               <span>{pl.label}</span>
-                              <ArrowRight className="w-3 h-3" />
+                              <ArrowRight className="w-3 h-3 text-indigo-500" />
                             </a>
                           ))}
                         </div>
@@ -1040,7 +1040,7 @@ export default function App() {
               {/* Right Column: Search, Category Filters & Destination Cards */}
               <div className="lg:col-span-5 space-y-4">
                 {/* Search Bar & Category Filters with Gemini AI Discovery */}
-                <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.04)] space-y-3.5">
+                <div className="bg-white/90 backdrop-blur-xl p-5 rounded-3xl border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -1058,14 +1058,14 @@ export default function App() {
                           }
                         }}
                         placeholder="Search any destination worldwide (Goa, Paris, Tokyo, Jaipur)..."
-                        className="w-full bg-slate-50/80 border border-slate-200/90 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 transition-all placeholder:text-slate-400"
+                        className="w-full bg-slate-50/80 border border-slate-200/90 rounded-2xl pl-10 pr-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-400"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={() => handleGeminiSearch()}
                       disabled={isAiSearching}
-                      className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                      className="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 text-white rounded-2xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
                       title="Discover authentic spots with Google Gemini AI"
                     >
                       {isAiSearching ? (
@@ -1107,10 +1107,10 @@ export default function App() {
                             setSearchQuery(hub.query);
                             handleGeminiSearch(hub.query);
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border ${
+                          className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all cursor-pointer border ${
                             searchQuery.toLowerCase().includes(hub.label.toLowerCase().split(' ')[0])
-                              ? 'bg-indigo-50 text-indigo-900 border-indigo-200 font-semibold'
-                              : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200/70'
+                              ? 'bg-slate-950 text-white border-slate-950 font-semibold shadow-xs'
+                              : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200/70 hover:text-slate-950'
                           }`}
                         >
                           {hub.label}
@@ -1120,7 +1120,7 @@ export default function App() {
                   </div>
 
                   {/* Category Filter Tabs */}
-                  <div className="flex flex-wrap gap-1 pt-1 border-t border-slate-100">
+                  <div className="flex flex-wrap gap-1.5 pt-1.5 border-t border-slate-100/90">
                     {categories.map((cat) => (
                       <button
                         key={cat}
@@ -1128,10 +1128,10 @@ export default function App() {
                           setSelectedCategory(cat);
                           handleSearch(searchQuery, cat);
                         }}
-                        className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer ${
                           selectedCategory === cat
-                            ? 'bg-slate-900 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                            ? 'bg-slate-950 text-white shadow-xs'
+                            : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
                         }`}
                       >
                         {cat}

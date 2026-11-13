@@ -46,28 +46,30 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
   const currentLangObj = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   return (
-    <div ref={dockRef} className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-1.5 no-print">
+    <div ref={dockRef} className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2 no-print">
       <AnimatePresence>
         {!isCollapsed && (
           <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            initial={{ opacity: 0, y: 14, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.96 }}
-            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col items-end gap-1.5"
+            exit={{ opacity: 0, y: 14, scale: 0.95 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-end gap-2"
           >
             {/* 1. Budget & Group */}
             <button
               type="button"
               onClick={() => onSelectTab('budget')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold shadow-md border backdrop-blur-md cursor-pointer ${
+              className={`flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold shadow-md border backdrop-blur-xl transition-all hover:-translate-x-1 cursor-pointer ${
                 activeTab === 'budget'
-                  ? 'bg-slate-900 text-white border-slate-800'
-                  : 'bg-white/95 text-slate-800 border-slate-200 hover:bg-indigo-50 hover:border-indigo-300'
+                  ? 'bg-slate-950 text-white border-slate-900 shadow-slate-950/20'
+                  : 'bg-white/95 text-slate-800 border-slate-200/90 hover:bg-slate-50 hover:border-slate-300'
               }`}
               title="Open Budget & Group Expense Manager"
             >
-              <Wallet className="w-3.5 h-3.5 text-indigo-500" />
+              <div className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                <Wallet className="w-3.5 h-3.5" />
+              </div>
               <span>Budget &amp; Group</span>
             </button>
 
@@ -75,10 +77,12 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
             <button
               type="button"
               onClick={onOpenPackingList}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200 shadow-md backdrop-blur-md hover:bg-indigo-50 hover:border-indigo-300 cursor-pointer"
+              className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
               title="Open Smart Packing Checklist"
             >
-              <Shirt className="w-3.5 h-3.5 text-indigo-500" />
+              <div className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                <Shirt className="w-3.5 h-3.5" />
+              </div>
               <span>Packing</span>
             </button>
 
@@ -86,10 +90,12 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
             <button
               type="button"
               onClick={onOpenExportSheet}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200 shadow-md backdrop-blur-md hover:bg-indigo-50 hover:border-indigo-300 cursor-pointer"
+              className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
               title="Export PDF / Offline Travel Sheet"
             >
-              <FileText className="w-3.5 h-3.5 text-indigo-500" />
+              <div className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                <FileText className="w-3.5 h-3.5" />
+              </div>
               <span>Export PDF</span>
             </button>
 
@@ -98,15 +104,20 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
               <button
                 type="button"
                 onClick={() => setOpenMenu(openMenu === 'lang' ? null : 'lang')}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200 shadow-md backdrop-blur-md hover:bg-indigo-50 hover:border-indigo-300 cursor-pointer"
+                className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
                 title="Change Language"
               >
-                <Globe2 className="w-3.5 h-3.5 text-indigo-500" />
+                <div className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                  <Globe2 className="w-3.5 h-3.5" />
+                </div>
                 <span>{currentLangObj.flag} {currentLangObj.nativeName}</span>
               </button>
 
               {openMenu === 'lang' && (
-                <div className="absolute right-full bottom-0 mr-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-50">
+                <div className="absolute right-full bottom-0 mr-2 w-48 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    Select Language
+                  </div>
                   {SUPPORTED_LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
@@ -115,11 +126,14 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
                         setLanguage(lang.code);
                         setOpenMenu(null);
                       }}
-                      className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 cursor-pointer ${
-                        language === lang.code ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700'
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                        language === lang.code ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
                       }`}
                     >
-                      <span>{lang.flag} {lang.nativeName}</span>
+                      <span className="flex items-center gap-2">
+                        <span>{lang.flag}</span>
+                        <span>{lang.nativeName}</span>
+                      </span>
                       {language === lang.code && <Check className="w-3.5 h-3.5 text-indigo-600" />}
                     </button>
                   ))}
@@ -132,15 +146,20 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
               <button
                 type="button"
                 onClick={() => setOpenMenu(openMenu === 'curr' ? null : 'curr')}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200 shadow-md backdrop-blur-md hover:bg-indigo-50 hover:border-indigo-300 cursor-pointer"
+                className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
                 title="Change Display Currency"
               >
-                <Coins className="w-3.5 h-3.5 text-amber-500" />
+                <div className="w-5 h-5 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                  <Coins className="w-3.5 h-3.5" />
+                </div>
                 <span>{currency}</span>
               </button>
 
               {openMenu === 'curr' && (
-                <div className="absolute right-full bottom-0 mr-2 w-36 bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-50">
+                <div className="absolute right-full bottom-0 mr-2 w-40 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    Currency
+                  </div>
                   {CURRENCIES.map((c) => (
                     <button
                       key={c.code}
@@ -149,8 +168,8 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
                         setCurrency(c.code);
                         setOpenMenu(null);
                       }}
-                      className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 cursor-pointer ${
-                        currency === c.code ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700'
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                        currency === c.code ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
                       }`}
                     >
                       <span>{c.label}</span>
@@ -165,10 +184,12 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
             <button
               type="button"
               onClick={onOpenDiagnostics}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200 shadow-md backdrop-blur-md hover:bg-indigo-50 hover:border-indigo-300 cursor-pointer"
-              title="Open System & Model Diagnostics"
+              className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-semibold bg-white/95 text-slate-800 border border-slate-200/90 shadow-md backdrop-blur-xl hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-x-1 cursor-pointer"
+              title="Open System &amp; Model Diagnostics"
             >
-              <BarChart2 className="w-3.5 h-3.5 text-emerald-600" />
+              <div className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <BarChart2 className="w-3.5 h-3.5" />
+              </div>
               <span>Diagnostics</span>
             </button>
           </motion.div>
@@ -182,10 +203,10 @@ export const FloatingQuickDock: React.FC<FloatingQuickDockProps> = ({
           setIsCollapsed((v) => !v);
           setOpenMenu(null);
         }}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-slate-900 text-white shadow-lg border border-slate-700 hover:bg-slate-800 cursor-pointer"
+        className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold bg-slate-950 text-white shadow-xl ring-1 ring-white/10 hover:bg-slate-900 transition-all hover:scale-105 active:scale-95 cursor-pointer"
       >
-        {isCollapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-        <span>{isCollapsed ? 'Quick Tools' : 'Hide Tools'}</span>
+        {isCollapsed ? <ChevronUp className="w-3.5 h-3.5 text-indigo-400" /> : <ChevronDown className="w-3.5 h-3.5 text-indigo-400" />}
+        <span>{isCollapsed ? 'Quick Tools' : 'Hide'}</span>
       </button>
     </div>
   );

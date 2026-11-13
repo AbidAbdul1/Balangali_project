@@ -37,10 +37,10 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
 
   return (
     <div
-      className={`group bg-white rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
+      className={`group bg-white rounded-3xl border transition-all duration-300 overflow-hidden flex flex-col justify-between hover:-translate-y-1 ${
         isSelected
           ? 'border-indigo-600 ring-2 ring-indigo-600/15 shadow-md'
-          : 'border-slate-200/80 hover:border-slate-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
+          : 'border-slate-200/80 hover:border-slate-300 hover:shadow-[0_16px_36px_-6px_rgba(15,23,42,0.08)]'
       }`}
     >
       <div>
@@ -228,7 +228,7 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
         <button
           type="button"
           onClick={onCalculateRoute}
-          className="flex-1 py-2 px-3 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold rounded-xl border border-slate-200/80 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-950 text-xs font-semibold rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           title="Calculate route and traffic conditions from origin"
         >
           <Navigation className="w-3.5 h-3.5 text-indigo-600" />
@@ -238,10 +238,10 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
         <button
           type="button"
           onClick={onAddToItinerary}
-          className={`py-2 px-4 text-xs font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
+          className={`py-2 px-4 text-xs font-semibold rounded-full transition-all flex items-center gap-1.5 cursor-pointer shadow-xs hover:scale-[1.02] active:scale-95 ${
             isInItinerary
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-              : 'bg-slate-900 hover:bg-slate-800 text-white'
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+              : 'bg-slate-950 hover:bg-slate-900 text-white shadow-slate-950/20'
           }`}
           title="Add destination to active itinerary plan"
         >

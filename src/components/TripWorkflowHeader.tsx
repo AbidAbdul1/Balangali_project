@@ -178,24 +178,26 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
   );
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.04)] mb-6">
+    <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-6 transition-all">
       <div className="p-4 sm:p-5">
-        {/* Top Header Row: Clean Context & Plan Summary */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 block">
+        {/* Top Header Row: Clean Luxury Context & Plan Summary */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-100/90">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
               Trip Command Center
             </span>
-            <h2 className="font-display text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-              Plan Your Journey
-            </h2>
+            <span className="text-slate-300">·</span>
+            <span className="text-xs font-bold text-slate-900 tracking-tight">
+              Interactive Route &amp; Budget Engine
+            </span>
           </div>
 
           {/* Quick Plan Stats / Cart & Self-Planning Controls */}
           <div className="flex items-center gap-2">
             <button
               onClick={onOpenItinerary}
-              className="flex items-center gap-2 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-3.5 py-1.5 bg-slate-950 hover:bg-slate-900 text-white rounded-full text-xs font-semibold shadow-sm transition-all hover:scale-[1.02] cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>{t('addedToPlan', 'Active Plan')}:</span>
@@ -204,7 +206,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
               </span>
               {totalEstimatedCost > 0 && (
                 <>
-                  <span className="text-slate-500">·</span>
+                  <span className="text-slate-600">·</span>
                   <span className="font-mono font-bold text-emerald-400">
                     {currencySymbol}{totalEstimatedCost.toLocaleString()}
                   </span>
@@ -217,7 +219,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                 type="button"
                 onClick={onClearItinerary}
                 title="Clear all places to plan your route from scratch"
-                className="px-3 py-1.5 text-xs font-semibold text-rose-700 hover:text-rose-800 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer border border-rose-200/80"
+                className="px-3 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-full transition-colors cursor-pointer border border-rose-200/80"
               >
                 Clear
               </button>
@@ -228,7 +230,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                 type="button"
                 onClick={onAutoFillPlan}
                 title="Auto-fill an AI recommended itinerary"
-                className="px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-800 hover:bg-indigo-50 rounded-xl transition-colors cursor-pointer border border-indigo-200/80 flex items-center gap-1.5"
+                className="px-3.5 py-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-800 hover:bg-indigo-50/80 rounded-full transition-colors cursor-pointer border border-indigo-200/80 flex items-center gap-1.5 shadow-2xs"
               >
                 <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Auto-Suggest</span>
@@ -238,35 +240,34 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
         </div>
 
         {/* Unified 4-Segment Travel Planner Strip */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-3.5">
           {/* Segment 1: Origin / Starting Hub */}
           <div className="relative" ref={originFlyoutRef}>
             <div
               onClick={() => setIsEditingOrigin(!isEditingOrigin)}
-              className={`p-3 rounded-xl border transition-all cursor-pointer group ${
+              className={`p-3.5 rounded-2xl border transition-all cursor-pointer group bg-slate-50/60 hover:bg-white ${
                 isEditingOrigin
-                  ? 'border-indigo-600 ring-2 ring-indigo-600/10 bg-indigo-50/20'
-                  : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                  ? 'border-indigo-600 ring-2 ring-indigo-600/10 bg-white shadow-md'
+                  : 'border-slate-200/80 hover:border-slate-300 hover:shadow-xs'
               }`}
             >
-              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                <span className="flex items-center gap-1 text-emerald-700">
-                  <MapPin className="w-3.5 h-3.5" />
-                  <span>1. Starting From (Origin)</span>
+              <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span>1. Origin Point</span>
                 </span>
-                <span className="text-[10px] text-indigo-600 group-hover:underline">
+                <span className="text-indigo-600 group-hover:underline">
                   {isEditingOrigin ? 'Close' : 'Change'}
                 </span>
               </div>
               <div className="font-bold text-slate-900 text-sm truncate flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                 <span className="truncate">{startingLocation.name}</span>
               </div>
               <div className="text-[11px] text-slate-400 font-mono mt-0.5 truncate flex items-center gap-1.5">
                 <span>{startingLocation.latitude.toFixed(3)}°N, {startingLocation.longitude.toFixed(3)}°E</span>
                 {locationDiagnostics && (
                   <span className="text-[9px] font-sans font-semibold text-emerald-600">
-                    · {locationDiagnostics.detectionMethodLabel} (±{locationDiagnostics.accuracyMeters >= 1000 ? `${Math.round(locationDiagnostics.accuracyMeters / 1000)}km` : `${locationDiagnostics.accuracyMeters}m`})
+                    · ±{locationDiagnostics.accuracyMeters >= 1000 ? `${Math.round(locationDiagnostics.accuracyMeters / 1000)}km` : `${locationDiagnostics.accuracyMeters}m`}
                   </span>
                 )}
               </div>
@@ -444,20 +445,20 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
           <div className="relative" ref={destFlyoutRef}>
             <div
               onClick={() => setIsSelectingDestination(!isSelectingDestination)}
-              className={`p-3 rounded-xl border transition-all cursor-pointer group ${
+              className={`p-3.5 rounded-2xl border transition-all cursor-pointer group bg-slate-50/60 hover:bg-white ${
                 !selectedRegion
-                  ? 'border-indigo-500 bg-indigo-50/40 ring-2 ring-indigo-500/20'
+                  ? 'border-indigo-400/80 bg-indigo-50/50 ring-2 ring-indigo-500/20 shadow-xs'
                   : isSelectingDestination
-                  ? 'border-indigo-600 ring-2 ring-indigo-600/10 bg-indigo-50/20'
-                  : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                  ? 'border-indigo-600 ring-2 ring-indigo-600/10 bg-white shadow-md'
+                  : 'border-slate-200/80 hover:border-slate-300 hover:shadow-xs'
               }`}
             >
-              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                <span className="flex items-center gap-1 text-indigo-700">
+              <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                <span className="flex items-center gap-1.5 text-indigo-700 font-semibold">
                   <Navigation className="w-3.5 h-3.5" />
                   <span>2. Destination Hub</span>
                 </span>
-                <span className="text-[10px] text-indigo-600 font-bold group-hover:underline">
+                <span className="text-indigo-600 font-bold group-hover:underline">
                   {!selectedRegion ? 'Select City' : isSelectingDestination ? 'Close' : 'Switch'}
                 </span>
               </div>
@@ -466,7 +467,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                 <>
                   <div className="font-bold text-slate-900 text-sm truncate flex items-center justify-between">
                     <span className="truncate">{selectedRegion.name}</span>
-                    <span className="text-[11px] font-mono font-semibold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded">
+                    <span className="text-[10px] font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200/60">
                       {selectedRegion.destinations.length} spots
                     </span>
                   </div>
@@ -477,7 +478,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                 </>
               ) : (
                 <>
-                  <div className="font-bold text-indigo-900 text-sm truncate flex items-center gap-1.5">
+                  <div className="font-bold text-indigo-950 text-sm truncate flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-indigo-500 animate-ping shrink-0" />
                     <span>Choose Destination</span>
                   </div>
@@ -490,14 +491,14 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
 
             {/* Destination Selection Dropdown */}
             {isSelectingDestination && (
-              <div className="absolute left-0 top-full mt-2 w-full sm:w-96 bg-white rounded-xl shadow-xl border border-slate-200 p-3.5 z-40 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-900">
+              <div className="absolute left-0 top-full mt-2 w-full sm:w-[420px] max-w-[95vw] bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-4 z-40 space-y-3.5 animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between pb-1 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-900 tracking-tight">
                     Select Destination City / Circuit:
                   </span>
                   <button
                     onClick={() => setIsSelectingDestination(false)}
-                    className="text-slate-400 hover:text-slate-700 p-0.5 cursor-pointer"
+                    className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -510,13 +511,13 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                     value={destSearchQuery}
                     onChange={(e) => setDestSearchQuery(e.target.value)}
                     placeholder="Search city (Goa, Jaipur, Paris, Mumbai, Tokyo)..."
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200/90 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 text-slate-900 transition-all placeholder:text-slate-400"
                   />
                 </div>
 
                 {/* Gemini AI Custom Destination Synthesizer */}
                 {destSearchQuery.trim() && (
-                  <div className="p-2.5 bg-indigo-50/80 border border-indigo-200/80 rounded-lg flex items-center justify-between gap-2">
+                  <div className="p-3 bg-indigo-50/80 border border-indigo-200/80 rounded-xl flex items-center justify-between gap-2 shadow-2xs">
                     <div className="min-w-0">
                       <div className="text-xs font-bold text-indigo-950 truncate">
                         Discover "{destSearchQuery}"
@@ -567,16 +568,16 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                           setIsSearchingCustomCity(false);
                         }
                       }}
-                      className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-xs transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                      className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer shrink-0 disabled:opacity-50"
                     >
-                      <Sparkles className="w-3 h-3 text-amber-300" />
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                       <span>{isSearchingCustomCity ? 'Searching...' : 'Explore via AI'}</span>
                     </button>
                   </div>
                 )}
 
                 {/* Regions List */}
-                <div className="max-h-56 overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-lg">
+                <div className="max-h-56 overflow-y-auto divide-y divide-slate-100 border border-slate-200/80 rounded-xl">
                   {filteredRegions.map((region) => (
                     <button
                       key={region.id}
@@ -606,17 +607,17 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
           </div>
 
           {/* Segment 3: Days Planner */}
-          <div className="p-3 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 transition-all">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-              <span className="flex items-center gap-1 text-slate-700">
+          <div className="p-3.5 rounded-2xl border border-slate-200/80 hover:border-slate-300 bg-slate-50/60 hover:bg-white hover:shadow-xs transition-all">
+            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              <span className="flex items-center gap-1.5 text-slate-700 font-semibold">
                 <Calendar className="w-3.5 h-3.5 text-indigo-600" />
-                <span>3. Trip Duration</span>
+                <span>3. Duration</span>
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">1–30 Days</span>
+              <span className="text-[10px] text-slate-400 font-mono">1–30d</span>
             </div>
 
             <div className="flex items-center justify-between mt-1">
-              <div className="font-bold text-slate-900 text-sm font-mono">
+              <div className="font-bold text-slate-900 text-sm font-mono tracking-tight">
                 {tripDurationDays || 1} {(tripDurationDays || 1) === 1 ? 'Day' : 'Days'}
               </div>
 
@@ -624,7 +625,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                 <button
                   type="button"
                   onClick={() => onUpdateDurationDays && onUpdateDurationDays(Math.max(1, (tripDurationDays || 1) - 1))}
-                  className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-all shadow-2xs border border-slate-200 cursor-pointer active:scale-95"
                   title="Decrease days"
                 >
                   <Minus className="w-3 h-3" />
@@ -633,22 +634,22 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                 <button
                   type="button"
                   onClick={() => onUpdateDurationDays && onUpdateDurationDays(Math.min(30, (tripDurationDays || 1) + 1))}
-                  className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-all shadow-2xs border border-slate-200 cursor-pointer active:scale-95"
                   title="Increase days"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
             </div>
-            <div className="text-[11px] text-slate-400 mt-0.5">
+            <div className="text-[11px] text-slate-400 mt-0.5 truncate">
               Multi-day itinerary schedule
             </div>
           </div>
 
           {/* Segment 4: Target Budget */}
-          <div className="p-3 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 transition-all">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-              <span className="flex items-center gap-1 text-slate-700">
+          <div className="p-3.5 rounded-2xl border border-slate-200/80 hover:border-slate-300 bg-slate-50/60 hover:bg-white hover:shadow-xs transition-all">
+            <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              <span className="flex items-center gap-1.5 text-slate-700 font-semibold">
                 <Wallet className="w-3.5 h-3.5 text-indigo-600" />
                 <span>4. Target Budget</span>
               </span>
@@ -670,7 +671,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                     if (onUpdateBudgetAmount) onUpdateBudgetAmount(val);
                   }}
                   placeholder="Set budget..."
-                  className="w-full pl-6 pr-2 py-1 text-xs font-bold font-mono text-slate-900 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full pl-6 pr-2 py-1 text-xs font-bold font-mono text-slate-900 bg-white border border-slate-200/90 rounded-xl focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:outline-none transition-all placeholder:text-slate-400"
                 />
               </div>
 
@@ -680,10 +681,10 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                     key={amt}
                     type="button"
                     onClick={() => onUpdateBudgetAmount && onUpdateBudgetAmount(amt)}
-                    className={`px-1.5 py-1 text-[10px] font-mono rounded-md transition-colors cursor-pointer ${
+                    className={`px-2 py-1 text-[10px] font-mono rounded-lg transition-colors cursor-pointer ${
                       customBudgetAmount === amt
-                        ? 'bg-slate-900 text-white font-bold'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-950 text-white font-bold shadow-xs'
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/70'
                     }`}
                   >
                     {amt / 1000}k
@@ -691,7 +692,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                 ))}
               </div>
             </div>
-            <div className="text-[11px] text-slate-400 mt-0.5">
+            <div className="text-[11px] text-slate-400 mt-0.5 truncate">
               Live AI cost alerts
             </div>
           </div>

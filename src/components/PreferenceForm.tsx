@@ -224,10 +224,10 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({
   ) / 100;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.04)]">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+    <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <div className="flex items-center justify-between pb-4 border-b border-slate-100/90">
         <div>
-          <h2 className="font-display text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+          <h2 className="font-display text-base sm:text-lg font-black text-slate-950 tracking-tight">
             Travel Preferences & Parameters
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -236,10 +236,10 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({
         </div>
         <button
           onClick={() => setShowWeightSettings(!showWeightSettings)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors border ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full transition-all border cursor-pointer ${
             showWeightSettings
-              ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+              ? 'bg-slate-950 text-white border-slate-950 shadow-xs'
+              : 'bg-white text-slate-700 border-slate-200/80 hover:bg-slate-100'
           }`}
           title="Customize transparent scoring formula weights (SRS FR-14)"
         >
@@ -651,16 +651,16 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({
             type="button"
             onClick={onSubmit}
             disabled={isLoading}
-            className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 disabled:from-indigo-400 disabled:to-violet-400 text-white text-sm font-semibold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-3.5 px-4 bg-slate-950 hover:bg-slate-900 disabled:opacity-50 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md hover:shadow-xl transition-all hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
             {isLoading ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
-                Computing Recommendations & Routes...
+                <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
+                Computing Recommendations &amp; Routes...
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-4 h-4 text-amber-300" />
                 Calculate Personalized Recommendations
               </>
             )}
