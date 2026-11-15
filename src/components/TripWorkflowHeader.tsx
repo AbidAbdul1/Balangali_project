@@ -18,8 +18,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { ALL_REGIONS, WorldRegion } from '../data/destinations';
 import { Destination } from '../types/travel';
-import { detectLaptopLocation, LocationDiagnostics } from '../utils/locationService';
-import { LocationDiagnosticsCard } from './LocationDiagnosticsCard';
+import { detectLaptopLocation } from '../utils/locationService';
 import { GoogleMapsLocationModal } from './GoogleMapsLocationModal';
 
 interface TripWorkflowHeaderProps {
@@ -93,7 +92,6 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
   const [isSearchingDest, setIsSearchingDest] = useState(false);
 
   const [isDetectingGps, setIsDetectingGps] = useState(false);
-  const [diagnostics, setDiagnostics] = useState<LocationDiagnostics | null>(null);
   const [isMapPickerOpen, setIsMapPickerOpen] = useState(false);
   const [showDetailsStrip, setShowDetailsStrip] = useState(false);
 
@@ -136,7 +134,6 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
     setIsDetectingGps(true);
     try {
       const result = await detectLaptopLocation();
-      setDiagnostics(result);
       onSelectStartingLocation({
         name: result.name,
         latitude: result.latitude,
