@@ -15,7 +15,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, onClos
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[#243C32] text-white flex items-center justify-center">
               <BarChart2 className="w-4 h-4" />
             </div>
             <div>
@@ -69,7 +69,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, onClos
           {/* Section 2: Machine Learning Evaluation Metrics */}
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-indigo-600" />
+              <Cpu className="w-4 h-4 text-[#243C32]" />
               2. ML Traffic Prediction Model & Baseline Evaluation (SRS Section 11 & 12)
             </h3>
             <p className="text-slate-600 leading-relaxed text-[11px]">
@@ -108,7 +108,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, onClos
           {/* Section 3: Recommendation Scoring Formula Breakdown */}
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-indigo-600" />
+              <BookOpen className="w-4 h-4 text-[#243C32]" />
               3. Transparent Recommendation Scoring Model (SRS Section 10)
             </h3>
             <div className="p-3 bg-white rounded-lg border border-slate-200 font-mono text-xs text-slate-800">
@@ -122,7 +122,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, onClos
           {/* Section 4: Data Integrations & Attributions */}
           <div>
             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-indigo-600" />
+              <Layers className="w-4 h-4 text-[#243C32]" />
               4. External Services & Licensing Attribution (SRS Section 8)
             </h3>
             <div className="space-y-1.5 text-[11px] text-slate-600">

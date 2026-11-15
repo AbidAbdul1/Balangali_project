@@ -19,7 +19,7 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 
-interface NearbyDiscoveryPanelProps {
+export interface NearbyDiscoveryPanelProps {
   centerLocation: { name: string; latitude: number; longitude: number };
   itineraryDestinationIds: string[];
   onAddToItinerary: (dest: Destination) => void;
@@ -88,69 +88,70 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
   const isFoodMode = selectedType === 'restaurant' || selectedType === 'cafe';
 
   return (
-    <div className="space-y-6">
-      {/* Header & Filters */}
-      <div className="bg-white rounded-3xl border border-[#E8EAF2] overflow-hidden shadow-[0_10px_35px_-10px_rgba(16,24,40,0.06)]">
-        <div className="bg-hero-midnight text-white p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-[#14B8A6] text-xs font-extrabold uppercase tracking-wider mb-1">
-              <Compass className="w-4 h-4" />
-              <span>Nearby Discovery, Stays &amp; Dining</span>
-            </div>
-            <h2 className="font-display text-xl sm:text-2xl font-black text-white tracking-tight">
-              Around {centerLocation.name.split(',')[0]}
-            </h2>
-            <p className="text-xs text-slate-300 mt-1 max-w-2xl">
-              Real-world places via Google Places API (New) near ({centerLocation.latitude.toFixed(4)}, {centerLocation.longitude.toFixed(4)}). External booking/delivery links open third-party sites and do not confirm live availability.
-            </p>
-          </div>
-
-          <button
-            onClick={fetchNearby}
-            disabled={isLoading}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-gradient text-white text-xs font-bold shadow-md transition cursor-pointer shrink-0"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Refresh Nearby</span>
-          </button>
+    <div className="space-y-8 py-2">
+      {/* Editorial Header */}
+      <div className="pb-6 border-b border-[#E6E2D8] flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#91A995]">
+            Area Intelligence &amp; Live Places
+          </p>
+          <h2 className="font-display text-3xl font-semibold text-[#343A36] mt-1">
+            Around {centerLocation.name.split(',')[0]}
+          </h2>
+          <p className="text-sm text-[#858B84] mt-1 max-w-2xl">
+            Live places via Google Places around coordinates ({centerLocation.latitude.toFixed(4)}, {centerLocation.longitude.toFixed(4)}).
+          </p>
         </div>
 
-        <div className="p-5 sm:p-6">
-        {/* Category Pills */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {NEARBY_PRESETS.map((preset) => {
-            const Icon = preset.icon;
-            const active = selectedType === preset.id;
-            return (
-              <button
-                key={preset.id}
-                onClick={() => setSelectedType(preset.id)}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold transition cursor-pointer border ${
-                  active
-                    ? 'bg-[#101828] text-white border-[#101828] shadow-sm'
-                    : 'bg-[#F7F8FC] text-[#64748B] border-[#E8EAF2] hover:text-[#101828] hover:bg-white'
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${active ? 'text-[#14B8A6]' : 'text-[#5145E5]'}`} />
-                {preset.label}
-              </button>
-            );
-          })}
-        </div>
+        <button
+          type="button"
+          onClick={fetchNearby}
+          disabled={isLoading}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] text-xs font-medium transition-colors shrink-0"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          <span>Refresh Nearby</span>
+        </button>
+      </div>
 
-        {/* Distance, Rating, Open Now Filters */}
-        <div className="flex flex-wrap items-center gap-4 pt-3.5 border-t border-[#E8EAF2] text-xs">
-          <div className="flex items-center gap-2 text-slate-600 font-semibold">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
-            Filters:
+      {/* Category Tabs */}
+      <div className="border-b border-[#E6E2D8] flex items-center gap-6 overflow-x-auto no-scrollbar">
+        {NEARBY_PRESETS.map((preset) => {
+          const active = selectedType === preset.id;
+          return (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => setSelectedType(preset.id)}
+              className={`relative pb-3 text-sm whitespace-nowrap transition-colors ${
+                active
+                  ? 'text-[#243C32] font-semibold'
+                  : 'text-[#858B84] hover:text-[#343A36]'
+              }`}
+            >
+              {preset.label}
+              {active && (
+                <span className="absolute left-0 right-0 bottom-0 h-[2px] bg-[#243C32] rounded-full" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Filter Controls Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-[#858B84]">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-1.5 text-[#343A36] font-medium">
+            <SlidersHorizontal className="w-3.5 h-3.5 text-[#91A995]" />
+            <span>Filters:</span>
           </div>
 
-          <label className="flex items-center gap-1.5 text-slate-700">
+          <label className="flex items-center gap-1.5">
             <span>Radius:</span>
             <select
               value={radiusMeters}
               onChange={(e) => setRadiusMeters(Number(e.target.value))}
-              className="px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 font-medium"
+              className="bg-[#FFFFFF] border border-[#E6E2D8] rounded-lg px-2 py-1 text-xs text-[#343A36]"
             >
               <option value={1500}>1.5 km</option>
               <option value={3000}>3 km</option>
@@ -160,12 +161,12 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
             </select>
           </label>
 
-          <label className="flex items-center gap-1.5 text-slate-700">
-            <span>Min Rating:</span>
+          <label className="flex items-center gap-1.5">
+            <span>Rating:</span>
             <select
               value={minRating}
               onChange={(e) => setMinRating(Number(e.target.value))}
-              className="px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 font-medium"
+              className="bg-[#FFFFFF] border border-[#E6E2D8] rounded-lg px-2 py-1 text-xs text-[#343A36]"
             >
               <option value={0}>Any</option>
               <option value={3.5}>3.5★+</option>
@@ -174,111 +175,103 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
             </select>
           </label>
 
-          <label className="inline-flex items-center gap-1.5 text-slate-700 cursor-pointer">
+          <label className="inline-flex items-center gap-1.5 cursor-pointer text-[#343A36]">
             <input
               type="checkbox"
               checked={openNowOnly}
               onChange={(e) => setOpenNowOnly(e.target.checked)}
-              className="rounded border-slate-300 text-indigo-600"
+              className="rounded accent-[#243C32]"
             />
-            <span>Open Now Only</span>
+            <span>Open Now</span>
           </label>
+        </div>
 
-          <span className="ml-auto text-[#64748B] font-bold">
-            {places.length} {places.length === 1 ? 'place' : 'places'} found
-          </span>
-        </div>
-        </div>
+        <span className="text-xs text-[#858B84]">
+          {places.length} {places.length === 1 ? 'place' : 'places'} found
+        </span>
       </div>
 
-      {/* Results Grid */}
+      {/* Results */}
       {isLoading ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-          <RefreshCw className="w-7 h-7 text-indigo-500 animate-spin mx-auto mb-3" />
-          <p className="text-sm font-semibold text-slate-700">Searching nearby places via Google Places API (New)...</p>
+        <div className="py-16 text-center space-y-3">
+          <RefreshCw className="w-6 h-6 text-[#243C32] animate-spin mx-auto" />
+          <p className="text-sm text-[#858B84]">Searching nearby places...</p>
         </div>
       ) : errorMsg ? (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-sm text-amber-900">
-          <p className="font-bold mb-1">Nearby Search Notice</p>
-          <p>{errorMsg}</p>
-        </div>
+        <p className="py-8 text-sm text-[#D68B65]">{errorMsg}</p>
       ) : places.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center text-sm text-slate-500">
+        <p className="py-8 text-sm text-[#858B84]">
           No places matched these filters. Try increasing the radius or lowering the minimum rating.
-        </div>
+        </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
           {places.map((place) => {
             const inPlan = itineraryDestinationIds.includes(place.id);
             return (
-              <div
-                key={place.id}
-                className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col"
-              >
-                <div className="relative h-40 bg-slate-100">
+              <article key={place.id} className="group space-y-3">
+                <div className="relative overflow-hidden rounded-2xl aspect-[16/10] bg-[#EFECE4]">
                   {place.imageUrl ? (
                     <img
                       src={place.imageUrl}
                       alt={place.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
+                    <div className="w-full h-full flex items-center justify-center text-[#858B84] text-xs">
                       No photo available
                     </div>
                   )}
+
                   {place.rating > 0 && (
-                    <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-900/85 text-white text-xs font-bold">
-                      <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                    <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FFFFFF]/90 text-xs font-semibold text-[#343A36]">
+                      <Star className="w-3 h-3 text-[#D68B65] fill-[#D68B65]" />
                       {place.rating.toFixed(1)}
                       {place.reviewsCount > 0 && (
-                        <span className="text-slate-300 font-normal">({place.reviewsCount.toLocaleString()})</span>
+                        <span className="text-[#858B84] font-normal">({place.reviewsCount.toLocaleString()})</span>
                       )}
-                    </span>
-                  )}
-                  {place.priceLevel && (
-                    <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-lg bg-white/90 text-slate-800 text-[10px] font-bold">
-                      {place.priceLevel.replace('PRICE_LEVEL_', '')}
                     </span>
                   )}
                 </div>
 
-                <div className="p-4 flex-1 flex flex-col justify-between gap-3">
-                  <div>
-                    <h3 className="font-display font-bold text-slate-900 text-sm line-clamp-1">{place.name}</h3>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-2 flex items-start gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-                      <span>{place.address}</span>
-                    </p>
-                    <p className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-slate-400" />
+                <div className="space-y-1.5">
+                  <h3 className="font-display font-semibold text-[#343A36] text-base group-hover:text-[#243C32] transition-colors line-clamp-1">
+                    {place.name}
+                  </h3>
+
+                  <p className="text-xs text-[#858B84] line-clamp-1 flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-[#91A995] shrink-0" />
+                    <span>{place.address}</span>
+                  </p>
+
+                  {place.openingHours && (
+                    <p className="text-[11px] text-[#858B84] flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-[#858B84]" />
                       <span>{place.openingHours}</span>
                     </p>
-                    {place.photoAttribution && (
-                      <p className="text-[10px] text-slate-400 mt-1">Photo: {place.photoAttribution}</p>
-                    )}
-                  </div>
+                  )}
 
-                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
                     <button
+                      type="button"
                       onClick={() => onAddToItinerary(place)}
                       disabled={inPlan}
-                      className={`flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                      className={`inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
                         inPlan
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                          ? 'bg-[#91A995]/20 text-[#243C32]'
+                          : 'bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF]'
                       }`}
                     >
                       {inPlan ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-                      {inPlan ? 'In Plan' : 'Add to Plan'}
+                      <span>{inPlan ? 'In plan' : 'Add to plan'}</span>
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => onFocusOnMap(place)}
-                      className="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                      className="text-xs font-medium text-[#343A36] hover:text-[#243C32]"
                     >
-                      Map
+                      Focus map
                     </button>
 
                     {place.googleMapsUri && (
@@ -286,10 +279,10 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
                         href={place.googleMapsUri}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        className="inline-flex items-center gap-0.5 text-xs text-[#858B84] hover:text-[#343A36]"
                       >
+                        <span>Maps</span>
                         <ExternalLink className="w-3 h-3" />
-                        Maps
                       </a>
                     )}
 
@@ -298,9 +291,10 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
                         href={`https://www.booking.com/searchresults.html?ss=${encodeURIComponent(place.name)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-blue-50 text-blue-700 text-[11px] font-semibold hover:bg-blue-100"
+                        className="inline-flex items-center gap-0.5 text-xs text-[#243C32] font-medium hover:underline"
                       >
-                        Check Rates <ExternalLink className="w-3 h-3" />
+                        <span>Check rates</span>
+                        <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
 
@@ -309,14 +303,15 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
                         href={`https://www.zomato.com/search?q=${encodeURIComponent(place.name)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-700 text-[11px] font-semibold hover:bg-rose-100"
+                        className="inline-flex items-center gap-0.5 text-xs text-[#D68B65] font-medium hover:underline"
                       >
-                        Zomato / Menu <ExternalLink className="w-3 h-3" />
+                        <span>Menu</span>
+                        <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
@@ -325,3 +320,4 @@ export const NearbyDiscoveryPanel: React.FC<NearbyDiscoveryPanelProps> = ({
   );
 };
 
+export default NearbyDiscoveryPanel;

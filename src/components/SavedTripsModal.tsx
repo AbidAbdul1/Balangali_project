@@ -1,7 +1,7 @@
 import React from 'react';
 import { ItineraryPlan } from '../types/travel';
 import { getDestinationImageUrl, CATEGORY_FALLBACK_IMAGES } from '../utils/destinationImages';
-import { Bookmark, Calendar, Trash2, ArrowRight, X, MapPin, Wallet } from 'lucide-react';
+import { Bookmark, Trash2, ArrowRight, X, MapPin, Wallet } from 'lucide-react';
 
 interface SavedTripsModalProps {
   isOpen: boolean;
@@ -21,44 +21,38 @@ export const SavedTripsModal: React.FC<SavedTripsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#101828]/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-3xl w-full border border-[#E8EAF2] shadow-2xl overflow-hidden flex flex-col max-h-[86vh] animate-fade-slide-up">
-        {/* Midnight Header */}
-        <div className="px-6 py-5 bg-hero-midnight text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-brand-gradient text-white flex items-center justify-center shadow-md">
-              <Bookmark className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#14B8A6] block">
-                Personal Travel Archive
-              </span>
-              <h2 className="font-display text-lg font-black text-white tracking-tight">
-                Saved Trips ({savedTrips.length})
-              </h2>
-            </div>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#343A36]/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-[#FFFFFF] rounded-3xl max-w-3xl w-full border border-[#E6E2D8] shadow-2xl overflow-hidden flex flex-col max-h-[86vh]">
+        {/* Editorial Header */}
+        <div className="px-6 py-5 border-b border-[#E6E2D8] flex items-center justify-between bg-[#F7F5EF]">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#91A995] block">
+              Personal Travel Archive
+            </span>
+            <h2 className="font-display text-xl font-semibold text-[#343A36]">
+              Saved Trips ({savedTrips.length})
+            </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+            aria-label="Close modal"
+            className="p-2 text-[#858B84] hover:text-[#343A36] rounded-full hover:bg-[#FFFFFF] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* List of saved trips */}
-        <div className="p-6 overflow-y-auto space-y-4 bg-[#F7F8FC] flex-1">
+        <div className="p-6 overflow-y-auto space-y-4 bg-[#F7F5EF] flex-1">
           {savedTrips.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-3xl border border-[#E8EAF2] p-6">
-              <div className="w-12 h-12 rounded-2xl bg-[#5145E5]/10 text-[#5145E5] flex items-center justify-center mx-auto mb-3">
-                <Bookmark className="w-6 h-6" />
-              </div>
-              <p className="font-display text-base font-bold text-[#101828]">
+            <div className="text-center py-12 bg-[#FFFFFF] rounded-2xl border border-[#E6E2D8] p-6 space-y-2">
+              <Bookmark className="w-8 h-8 text-[#91A995] mx-auto" />
+              <p className="font-display text-base font-semibold text-[#343A36]">
                 No saved itineraries yet
               </p>
-              <p className="text-xs text-[#64748B] mt-1 max-w-sm mx-auto">
-                Build your multi-day itinerary in the Trip Planner and click &ldquo;Save Trip&rdquo; to access it anytime.
+              <p className="text-xs text-[#858B84] max-w-sm mx-auto">
+                Build your multi-day itinerary in My Trips and click &ldquo;Save trip&rdquo; to access it anytime.
               </p>
             </div>
           ) : (
@@ -81,11 +75,11 @@ export const SavedTripsModal: React.FC<SavedTripsModalProps> = ({
                 return (
                   <article
                     key={trip.id}
-                    className="luxury-card overflow-hidden flex flex-col justify-between bg-white"
+                    className="overflow-hidden flex flex-col justify-between bg-[#FFFFFF] rounded-2xl border border-[#E6E2D8] hover:border-[#243C32] transition-colors"
                   >
                     <div>
                       {/* Destination Cover Image */}
-                      <div className="relative h-40 w-full bg-slate-100 overflow-hidden">
+                      <div className="relative h-36 w-full bg-[#EFECE4] overflow-hidden">
                         <img
                           src={coverImg}
                           alt={trip.title}
@@ -96,33 +90,29 @@ export const SavedTripsModal: React.FC<SavedTripsModalProps> = ({
                           className="w-full h-full object-cover"
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#101828]/80 via-[#101828]/25 to-transparent" />
-                        <div className="absolute top-3 left-3 bg-[#101828]/70 backdrop-blur-md text-white text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border border-white/15">
-                          {trip.days.length} {trip.days.length === 1 ? 'Day' : 'Days'} ·{' '}
-                          {trip.totalDestinations} Stops
-                        </div>
-                        <div className="absolute bottom-3 left-3.5 right-3.5 text-white">
-                          <span className="text-[10px] font-mono text-white/80 block">
-                            Saved {formattedDate}
-                          </span>
-                          <h4 className="font-display text-base font-black text-white truncate">
-                            {trip.title}
-                          </h4>
+                        <div className="absolute top-2.5 left-2.5 bg-[#FFFFFF]/90 text-[#343A36] text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
+                          {trip.days.length} {trip.days.length === 1 ? 'Day' : 'Days'} · {trip.totalDestinations} Stops
                         </div>
                       </div>
 
                       {/* Trip Metadata */}
-                      <div className="p-4 space-y-2">
-                        <div className="flex items-center gap-1.5 text-xs text-[#64748B] truncate">
-                          <MapPin className="w-3.5 h-3.5 text-[#5145E5] shrink-0" />
-                          <span className="truncate">Origin: {trip.startingLocation.name}</span>
+                      <div className="p-4 space-y-1.5">
+                        <span className="text-[11px] text-[#858B84] block">
+                          Saved {formattedDate}
+                        </span>
+                        <h4 className="font-display text-base font-semibold text-[#343A36] truncate">
+                          {trip.title}
+                        </h4>
+                        <div className="flex items-center gap-1.5 text-xs text-[#858B84] truncate">
+                          <MapPin className="w-3.5 h-3.5 text-[#91A995] shrink-0" />
+                          <span className="truncate">Origin: {trip.startingLocation.name.split(',')[0]}</span>
                         </div>
-                        <div className="flex items-center justify-between text-xs pt-2 border-t border-[#E8EAF2]">
-                          <span className="text-[#64748B] flex items-center gap-1 font-medium">
-                            <Wallet className="w-3.5 h-3.5 text-[#14B8A6]" />
-                            <span>Est. Budget:</span>
+                        <div className="flex items-center justify-between text-xs pt-2 border-t border-[#E6E2D8]">
+                          <span className="text-[#858B84] flex items-center gap-1">
+                            <Wallet className="w-3.5 h-3.5 text-[#91A995]" />
+                            <span>Target Budget:</span>
                           </span>
-                          <span className="font-mono font-bold text-[#101828]">
+                          <span className="font-semibold text-[#343A36]">
                             ₹{trip.totalEstimatedBudgetINR.toLocaleString()}
                           </span>
                         </div>
@@ -134,7 +124,7 @@ export const SavedTripsModal: React.FC<SavedTripsModalProps> = ({
                       <button
                         type="button"
                         onClick={() => onDeleteTrip(trip.id)}
-                        className="p-2 text-[#64748B] hover:text-rose-600 rounded-xl hover:bg-rose-50 border border-[#E8EAF2] transition-colors cursor-pointer"
+                        className="p-2 text-[#858B84] hover:text-[#D68B65] rounded-full transition-colors"
                         title="Delete saved trip"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -146,9 +136,9 @@ export const SavedTripsModal: React.FC<SavedTripsModalProps> = ({
                           onLoadTrip(trip);
                           onClose();
                         }}
-                        className="flex-1 py-2 px-4 text-xs font-bold text-white bg-brand-gradient rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                        className="flex-1 py-2 px-4 text-xs font-medium text-[#FFFFFF] bg-[#243C32] hover:bg-[#1B2E26] rounded-full transition-colors flex items-center justify-center gap-1.5"
                       >
-                        <span>Open Trip</span>
+                        <span>Open trip</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -162,3 +152,5 @@ export const SavedTripsModal: React.FC<SavedTripsModalProps> = ({
     </div>
   );
 };
+
+export default SavedTripsModal;

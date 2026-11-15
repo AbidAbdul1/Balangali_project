@@ -786,7 +786,7 @@ export default function App() {
   const plannedDestinations = itinerary ? itinerary.days.flatMap((d) => d.items.map((it) => it.destination)) : [];
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[#F7F8FC] flex flex-col text-[#101828] selection:bg-[#5145E5]/15 selection:text-[#5145E5]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#F7F5EF] flex flex-col text-[#343A36] selection:bg-[#91A995]/20 selection:text-[#243C32]">
       {/* Fixed Top Horizontal Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -798,6 +798,10 @@ export default function App() {
           }
         }}
         savedTripsCount={savedTrips.length}
+        onOpenSavedTrips={() => setIsSavedTripsModalOpen(true)}
+        onOpenPacking={() => setIsPackingModalOpen(true)}
+        onOpenDiagnostics={() => setIsEvaluationOpen(true)}
+        onExportPdf={() => setIsExportModalOpen(true)}
       />
 
       {/* Animated Toast Notification */}
@@ -808,9 +812,9 @@ export default function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-6 left-6 z-50 bg-[#101828]/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl border border-white/15 text-xs font-medium flex items-center gap-2.5"
+            className="fixed bottom-6 left-6 z-50 bg-[#243C32] text-white px-4 py-2.5 rounded-full shadow-xl border border-white/10 text-xs font-medium flex items-center gap-2.5"
           >
-            <CheckCircle className="w-4 h-4 text-[#14B8A6] shrink-0" />
+            <CheckCircle className="w-4 h-4 text-[#91A995] shrink-0" />
             <span>{toastMessage}</span>
           </motion.div>
         )}
@@ -864,23 +868,23 @@ export default function App() {
             ) : (
               <>
                 {/* Active Destination Top Bar */}
-                <div className="bg-hero-midnight text-white rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_16px_40px_-12px_rgba(16,24,40,0.25)]">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-brand-gradient text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#5145E5]/30 shrink-0">
-                      <MapPin className="w-5 h-5 text-white" />
+                <div className="bg-[#FFFFFF] border border-[#E6E2D8] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#243C32] flex items-center justify-center font-bold text-sm shrink-0">
+                      <MapPin className="w-5 h-5 text-[#243C32]" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-extrabold text-[#14B8A6] uppercase tracking-widest bg-[#14B8A6]/15 px-2.5 py-0.5 rounded-full border border-[#14B8A6]/30">
+                        <span className="text-[10px] font-semibold text-[#243C32] uppercase tracking-wider bg-[#91A995]/15 px-2.5 py-0.5 rounded-full">
                           Active Circuit
                         </span>
-                        <span className="text-xs text-slate-300 font-medium">
+                        <span className="text-xs text-[#858B84]">
                           {destinations.length} popular spots loaded
                         </span>
                       </div>
-                      <h2 className="font-display text-xl sm:text-2xl font-black text-white flex items-center gap-2 mt-0.5">
+                      <h2 className="font-display text-xl sm:text-2xl font-semibold text-[#343A36] flex items-center gap-2 mt-0.5">
                         <span>{selectedRegion.name}</span>
-                        <span className="text-xs font-normal text-slate-300">
+                        <span className="text-xs font-normal text-[#858B84]">
                           · {selectedRegion.state}
                           {selectedRegion.country ? `, ${selectedRegion.country}` : ''}
                         </span>
@@ -897,16 +901,16 @@ export default function App() {
                         setSelectedDestination(null);
                         setActiveRoute(null);
                       }}
-                      className="flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-white/15"
+                      className="flex-1 sm:flex-initial px-4 py-2 text-xs font-medium text-[#343A36] bg-[#FFFFFF] hover:bg-[#F7F5EF] rounded-full border border-[#D8D2C5] transition-colors flex items-center justify-center gap-1.5"
                     >
-                      <Globe className="w-3.5 h-3.5 text-[#14B8A6]" />
+                      <Globe className="w-3.5 h-3.5 text-[#243C32]" />
                       <span>All Destinations</span>
                     </button>
                     {itemsInPlanCount > 0 && (
                       <button
                         type="button"
                         onClick={() => setActiveTab('itinerary')}
-                        className="flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold text-white bg-brand-gradient rounded-xl transition-all hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
+                        className="flex-1 sm:flex-initial px-4 py-2 text-xs font-medium text-[#FFFFFF] bg-[#243C32] hover:bg-[#1B2E26] rounded-full transition-colors flex items-center justify-center gap-1.5"
                       >
                         <span>View Trip Plan ({itemsInPlanCount})</span>
                         <ArrowRight className="w-3.5 h-3.5 text-white" />
@@ -1051,10 +1055,10 @@ export default function App() {
               {/* Right Column: Search, Category Filters & Destination Cards */}
               <div className="lg:col-span-5 space-y-4">
                 {/* Search Bar & Category Filters with Gemini AI Discovery */}
-                <div className="bg-white/90 backdrop-blur-xl p-5 rounded-3xl border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
+                <div className="bg-[#FFFFFF] p-5 rounded-2xl border border-[#E6E2D8] space-y-4">
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                      <Search className="w-4 h-4 text-[#858B84] absolute left-3.5 top-3" />
                       <input
                         type="text"
                         value={searchQuery}
@@ -1069,14 +1073,14 @@ export default function App() {
                           }
                         }}
                         placeholder="Search any destination worldwide (Goa, Paris, Tokyo, Jaipur)..."
-                        className="w-full bg-slate-50/80 border border-slate-200/90 rounded-2xl pl-10 pr-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-400"
+                        className="w-full bg-[#F7F5EF] border border-[#E6E2D8] rounded-xl pl-10 pr-3 py-2 text-xs text-[#343A36] focus:outline-none focus:border-[#243C32] placeholder:text-[#858B84]"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={() => handleGeminiSearch()}
                       disabled={isAiSearching}
-                      className="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 text-white rounded-2xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
+                      className="px-4 py-2 bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                       title="Discover authentic spots with Google Gemini AI"
                     >
                       {isAiSearching ? (
@@ -1086,7 +1090,7 @@ export default function App() {
                         </>
                       ) : (
                         <>
-                          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                          <Sparkles className="w-3.5 h-3.5 text-[#D68B65]" />
                           <span>AI Discover</span>
                         </>
                       )}
@@ -1447,12 +1451,19 @@ export default function App() {
 
         {/* TAB: BUDGET MANAGER, AI COST OPTIMIZER & GROUP EXPENSE SPLITTING */}
         {activeTab === 'budget' && (
-          <Suspense fallback={<div className="p-10 text-center text-xs text-slate-500">Loading Budget & Group Manager...</div>}>
+          <Suspense fallback={<div className="p-10 text-center text-xs text-[#858B84]">Loading Budget &amp; Group Manager...</div>}>
             <BudgetGroupPanel
               itinerary={itinerary}
               travelersCount={travelersCount}
               customBudgetAmount={preferences.customBudgetAmount}
               onNotify={(msg) => showToast(msg)}
+              onJoinSharedTrip={(joinedTrip) => {
+                setItinerary(joinedTrip);
+                setActiveTab('itinerary');
+                const dests = joinedTrip.days.flatMap((d: any) => d.items.map((it: any) => it.destination));
+                fetchCostEstimation(dests);
+                showToast(`Synced with group trip "${joinedTrip.title}"!`);
+              }}
             />
           </Suspense>
         )}

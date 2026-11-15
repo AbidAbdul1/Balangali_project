@@ -172,6 +172,59 @@ describe('2. Expense Splitting & Balance Simplification', () => {
     assert.equal(bal.debts[0].to, 'Alice');
     assert.equal(bal.debts[0].amount, 2000);
   });
+
+  it('manages 6-character Ludo-style room codes and multi-app member joining', async () => {
+    const unsavedTripId = `trip-unsaved-${Date.now()}`;
+
+    // 1. Fetching members for an unsaved trip auto-creates trip with 6-char room code
+    const getRes = await fetch(`${baseUrl}/api/trips/${unsavedTripId}/members`);
+    assert.equal(getRes.status, 200);
+    const getData = await getRes.json();
+    assert.equal(getData.success, true);
+    assert.ok(typeof getData.shareCode === 'string');
+    assert.equal(getData.shareCode.length, 6, 'Room code should be exactly 6 characters');
+    const roomCode = getData.shareCode;
+
+    // 2. Add companion with name alone (no email provided)
+    const addRes1 = await fetch(`${baseUrl}/api/trips/${unsavedTripId}/members`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Rahul Sharma', role: 'companion' }),
+    });
+    assert.equal(addRes1.status, 201);
+    const addData1 = await addRes1.json();
+    assert.equal(addData1.success, true);
+    assert.equal(addData1.member.name, 'Rahul Sharma');
+    assert.ok(addData1.member.email.includes('@room.local'));
+
+    // 3. Add second companion with name alone (should not collide on email unique constraint)
+    const addRes2 = await fetch(`${baseUrl}/api/trips/${unsavedTripId}/members`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Priya Verma', role: 'companion' }),
+    });
+    assert.equal(addRes2.status, 201);
+    const addData2 = await addRes2.json();
+    assert.equal(addData2.success, true);
+    assert.equal(addData2.member.name, 'Priya Verma');
+    assert.notEqual(addData1.member.email, addData2.member.email);
+
+    // 4. Join group via 6-character room code from another device/guest
+    const joinRes = await fetch(`${baseUrl}/api/trips/join/${roomCode.toLowerCase()}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Ananya Roy' }),
+    });
+    assert.equal(joinRes.status, 200);
+    const joinData = await joinRes.json();
+    assert.equal(joinData.success, true);
+    assert.equal(joinData.tripId, unsavedTripId);
+    assert.equal(joinData.shareCode, roomCode);
+    const joinedNames = joinData.members.map((m: any) => m.name);
+    assert.ok(joinedNames.includes('Rahul Sharma'));
+    assert.ok(joinedNames.includes('Priya Verma'));
+    assert.ok(joinedNames.includes('Ananya Roy'));
+  });
 });
 
 describe('3. AI Cost Optimizer, Rescheduler & Route Optimizer', () => {

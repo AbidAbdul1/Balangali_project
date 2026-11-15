@@ -369,37 +369,114 @@ budgetGroupRouter.post('/trips/:tripId/settlements', (req: Request, res: Respons
   });
 });
 
+const ROOM_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function generateRoomCode(): string {
+  const bytes = crypto.randomBytes(6);
+  let code = '';
+  for (let i = 0; i < 6; i += 1) {
+    code += ROOM_CODE_ALPHABET[bytes[i] % ROOM_CODE_ALPHABET.length];
+  }
+  return code;
+}
+
+function createUniqueRoomCode(): string {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const candidate = generateRoomCode();
+    const existing = db.prepare('SELECT id FROM trips WHERE share_code = ?').get(candidate) as any;
+    if (!existing) {
+      return candidate;
+    }
+  }
+  return generateRoomCode();
+}
+
+function ensureTripRoomCode(tripId: string, regenerate = false, tripTitle?: string): { tripId: string; shareCode: string; isShared: boolean } {
+  const now = new Date().toISOString();
+  const tripRow = db.prepare('SELECT id, share_code, is_shared, trip_json, title FROM trips WHERE id = ?').get(tripId) as any;
+
+  if (!tripRow) {
+    const shareCode = createUniqueRoomCode();
+    const resolvedTitle = tripTitle?.trim() || 'Group Trip Room';
+    const placeholderTrip = {
+      id: tripId,
+      title: resolvedTitle,
+      days: [],
+      totalCost: 0,
+      shareCode,
+    };
+    db.prepare(
+      'INSERT INTO trips (id, owner_id, title, trip_json, is_shared, share_code, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).run(tripId, null, resolvedTitle, JSON.stringify(placeholderTrip), 1, shareCode, now, now);
+
+    return { tripId, shareCode, isShared: true };
+  }
+
+  let shareCode = tripRow.share_code as string | null;
+  if (regenerate || !shareCode) {
+    shareCode = createUniqueRoomCode();
+    db.prepare('UPDATE trips SET is_shared = 1, share_code = ?, updated_at = ? WHERE id = ?').run(shareCode, now, tripId);
+  } else if (!tripRow.is_shared) {
+    db.prepare('UPDATE trips SET is_shared = 1, updated_at = ? WHERE id = ?').run(now, tripId);
+  }
+
+  return { tripId, shareCode, isShared: true };
+}
+
+function mapMemberRow(m: any) {
+  return {
+    id: m.id,
+    tripId: m.trip_id,
+    userId: m.user_id,
+    email: m.email,
+    name: m.name,
+    role: m.role,
+    invitedAt: m.invited_at,
+  };
+}
+
 // Group Trip Members & Sharing
 budgetGroupRouter.get('/trips/:tripId/members', (req: Request, res: Response) => {
   const { tripId } = req.params;
+  const { shareCode, isShared } = ensureTripRoomCode(tripId);
   const members = db.prepare('SELECT * FROM trip_members WHERE trip_id = ? ORDER BY invited_at ASC').all(tripId) as any[];
-  const tripRow = db.prepare('SELECT share_code, is_shared FROM trips WHERE id = ?').get(tripId) as any;
   return res.json({
     success: true,
-    shareCode: tripRow?.share_code || null,
-    isShared: Boolean(tripRow?.is_shared),
-    members: members.map((m) => ({
-      id: m.id,
-      tripId: m.trip_id,
-      userId: m.user_id,
-      email: m.email,
-      name: m.name,
-      role: m.role,
-      invitedAt: m.invited_at,
-    })),
+    shareCode,
+    isShared,
+    members: members.map(mapMemberRow),
+  });
+});
+
+budgetGroupRouter.post('/trips/:tripId/room-code', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
+  const { tripId } = req.params;
+  const regenerate = Boolean(req.body?.regenerate);
+  const title = typeof req.body?.title === 'string' ? req.body.title : undefined;
+  const { shareCode, isShared } = ensureTripRoomCode(tripId, regenerate, title);
+  const members = db.prepare('SELECT * FROM trip_members WHERE trip_id = ? ORDER BY invited_at ASC').all(tripId) as any[];
+  return res.json({
+    success: true,
+    tripId,
+    shareCode,
+    isShared,
+    members: members.map(mapMemberRow),
   });
 });
 
 budgetGroupRouter.post('/trips/:tripId/members', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   const { tripId } = req.params;
   const name = String(req.body?.name || '').trim();
-  const email = String(req.body?.email || '').trim().toLowerCase();
+  const rawEmail = String(req.body?.email || '').trim().toLowerCase();
   const role = ['owner', 'editor', 'viewer'].includes(req.body?.role) ? req.body.role : 'editor';
 
-  if (!name || !email) {
-    return res.status(400).json({ success: false, error: 'Member name and email are required.' });
+  if (!name) {
+    return res.status(400).json({ success: false, error: 'Companion name is required.' });
   }
 
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'companion';
+  const email = rawEmail || `${slug}-${crypto.randomBytes(3).toString('hex')}@room.local`;
+
+  const { shareCode } = ensureTripRoomCode(tripId);
   const id = `mem_${crypto.randomUUID()}`;
   const invitedAt = new Date().toISOString();
   try {
@@ -408,14 +485,6 @@ budgetGroupRouter.post('/trips/:tripId/members', optionalAuth, (req: Authenticat
     ).run(id, tripId, null, email, name, role, invitedAt);
   } catch {
     db.prepare('UPDATE trip_members SET name = ?, role = ? WHERE trip_id = ? AND email = ?').run(name, role, tripId, email);
-  }
-
-  // Ensure trip has a share code
-  const trip = db.prepare('SELECT id, share_code FROM trips WHERE id = ?').get(tripId) as any;
-  let shareCode = trip?.share_code;
-  if (trip && !shareCode) {
-    shareCode = crypto.randomBytes(4).toString('hex').toUpperCase();
-    db.prepare('UPDATE trips SET is_shared = 1, share_code = ? WHERE id = ?').run(shareCode, tripId);
   }
 
   return res.status(201).json({
@@ -442,26 +511,37 @@ budgetGroupRouter.delete('/trips/:tripId/members/:memberId', (req: Request, res:
 });
 
 budgetGroupRouter.post('/trips/join/:shareCode', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
-  const shareCode = String(req.params.shareCode || '').trim().toUpperCase();
-  const trip = db.prepare('SELECT * FROM trips WHERE share_code = ?').get(shareCode) as any;
-  if (!trip) {
-    return res.status(404).json({ success: false, error: 'Invalid or expired trip share code.' });
+  const shareCode = String(req.params.shareCode || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!shareCode) {
+    return res.status(400).json({ success: false, error: 'Room code is required.' });
   }
 
-  const memberName = req.user?.name || String(req.body?.name || 'Guest Traveller').trim();
-  const memberEmail = req.user?.email || String(req.body?.email || `guest-${Date.now()}@travelmate.local`).trim().toLowerCase();
+  const trip = db.prepare('SELECT * FROM trips WHERE share_code = ?').get(shareCode) as any;
+  if (!trip) {
+    return res.status(404).json({ success: false, error: 'Room code not found. Double-check the 6-character code and try again.' });
+  }
+
+  const memberName = (String(req.body?.name || '').trim() || req.user?.name || 'Guest Traveller').trim();
+  const slug = memberName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'guest';
+  const rawEmail = String(req.body?.email || '').trim().toLowerCase();
+  const memberEmail = rawEmail || req.user?.email || `${slug}-${crypto.randomBytes(3).toString('hex')}@room.local`;
 
   try {
     db.prepare(
       'INSERT INTO trip_members (id, trip_id, user_id, email, name, role, invited_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
     ).run(`mem_${crypto.randomUUID()}`, trip.id, req.user?.id || null, memberEmail, memberName, 'editor', new Date().toISOString());
   } catch {
-    // Already a member
+    db.prepare('UPDATE trip_members SET name = ? WHERE trip_id = ? AND email = ?').run(memberName, trip.id, memberEmail);
   }
+
+  const members = db.prepare('SELECT * FROM trip_members WHERE trip_id = ? ORDER BY invited_at ASC').all(trip.id) as any[];
 
   return res.json({
     success: true,
+    tripId: trip.id,
+    shareCode: trip.share_code,
     trip: JSON.parse(trip.trip_json),
+    members: members.map(mapMemberRow),
   });
 });
 

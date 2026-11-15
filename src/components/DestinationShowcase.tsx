@@ -1,23 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { WorldRegion, ALL_REGIONS } from '../data/destinations';
-import {
-  Search,
-  Sparkles,
-  MapPin,
-  ArrowUpRight,
-  Compass,
-  Heart,
-  Globe2,
-  Sun,
-  Palmtree,
-  Mountain,
-  Landmark,
-  Flame,
-  Trees,
-  Building2,
-} from 'lucide-react';
+import { Heart, Search, ArrowRight, Loader2 } from 'lucide-react';
 
-interface DestinationShowcaseProps {
+export interface DestinationShowcaseProps {
   onSelectRegion: (region: WorldRegion) => void;
   onSearchCustomCity: (query: string) => void;
   isSearching: boolean;
@@ -44,98 +29,51 @@ export const REGION_COVER_IMAGES: Record<string, string> = {
   vijayawada: '/images/travelmate_kanakadurga_temple_1793036233893.jpg',
 };
 
-const FALLBACK_DESTINATION_COVER =
-  'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1000&q=80';
-
-export type ShowcaseFilterType =
+type ShowcaseFilterType =
   | 'all'
   | 'india'
   | 'international'
-  | 'beaches'
+  | 'beach'
   | 'mountains'
-  | 'historical'
-  | 'adventure'
-  | 'nature'
-  | 'cities';
+  | 'culture'
+  | 'city'
+  | 'food'
+  | 'favorites';
 
-const REGION_CATEGORY_TAGS: Record<string, ShowcaseFilterType[]> = {
-  vijayawada: ['india', 'historical', 'nature', 'cities'],
-  hyderabad: ['india', 'historical', 'cities'],
-  visakhapatnam: ['india', 'beaches', 'mountains', 'nature', 'adventure'],
-  jaipur: ['india', 'historical', 'cities', 'adventure'],
-  bengaluru: ['india', 'nature', 'cities', 'mountains'],
-  delhi: ['india', 'historical', 'cities'],
-  mumbai: ['india', 'beaches', 'cities', 'historical'],
-  goa: ['india', 'beaches', 'nature', 'adventure'],
-  agra: ['india', 'historical', 'cities'],
-  varanasi: ['india', 'historical', 'cities'],
-  paris: ['international', 'historical', 'cities'],
-  tokyo: ['international', 'cities', 'nature', 'mountains'],
-  london: ['international', 'historical', 'cities'],
-  'new-york': ['international', 'cities', 'nature'],
-  dubai: ['international', 'beaches', 'adventure', 'cities'],
-  rome: ['international', 'historical', 'cities'],
-  singapore: ['international', 'nature', 'cities', 'beaches'],
-  sydney: ['international', 'beaches', 'nature', 'adventure', 'cities'],
-};
+const CATEGORY_TABS: Array<{ id: ShowcaseFilterType; label: string }> = [
+  { id: 'all', label: 'All' },
+  { id: 'india', label: 'India' },
+  { id: 'international', label: 'International' },
+  { id: 'beach', label: 'Coast & Beaches' },
+  { id: 'mountains', label: 'Mountains & Hills' },
+  { id: 'culture', label: 'Heritage & Culture' },
+  { id: 'city', label: 'Cities' },
+  { id: 'food', label: 'Culinary' },
+  { id: 'favorites', label: 'Saved' },
+];
 
-function matchesRegionFilter(region: WorldRegion, filter: ShowcaseFilterType): boolean {
-  if (filter === 'all') return true;
-  if (filter === 'india') return !region.isInternational;
-  if (filter === 'international') return Boolean(region.isInternational);
+function getRegionCategories(region: WorldRegion): ShowcaseFilterType[] {
+  const cats: ShowcaseFilterType[] = ['all'];
+  if (region.isInternational) cats.push('international');
+  else cats.push('india');
 
-  const explicitTags = REGION_CATEGORY_TAGS[region.id];
-  if (explicitTags && explicitTags.includes(filter)) {
-    return true;
+  const text = `${region.id} ${region.name} ${region.tagline}`.toLowerCase();
+  if (text.includes('beach') || text.includes('coast') || text.includes('island') || region.id === 'goa' || region.id === 'visakhapatnam' || region.id === 'sydney') {
+    cats.push('beach');
   }
-
-  // Also check underlying destination tags & categories dynamically
-  const allText = [
-    region.tagline,
-    ...region.destinations.flatMap((d) => [d.category, d.shortDescription, ...d.tags]),
-  ]
-    .join(' ')
-    .toLowerCase();
-
-  switch (filter) {
-    case 'beaches':
-      return allText.includes('beach') || allText.includes('coast') || allText.includes('sea');
-    case 'mountains':
-      return (
-        allText.includes('hill') ||
-        allText.includes('valley') ||
-        allText.includes('mountain') ||
-        allText.includes('ghat')
-      );
-    case 'historical':
-      return (
-        allText.includes('heritage') ||
-        allText.includes('fort') ||
-        allText.includes('palace') ||
-        allText.includes('temple') ||
-        allText.includes('monument')
-      );
-    case 'adventure':
-      return (
-        allText.includes('adventure') ||
-        allText.includes('safari') ||
-        allText.includes('water') ||
-        allText.includes('cave') ||
-        allText.includes('trek')
-      );
-    case 'nature':
-      return (
-        allText.includes('nature') ||
-        allText.includes('island') ||
-        allText.includes('park') ||
-        allText.includes('garden') ||
-        allText.includes('lake')
-      );
-    case 'cities':
-      return region.destinations.length >= 3;
-    default:
-      return true;
+  if (text.includes('hill') || text.includes('valley') || text.includes('araku') || text.includes('park')) {
+    cats.push('mountains');
   }
+  if (text.includes('temple') || text.includes('heritage') || text.includes('royal') || text.includes('history') || text.includes('culture') || ['jaipur', 'agra', 'varanasi', 'rome', 'paris', 'vijayawada'].includes(region.id)) {
+    cats.push('culture');
+  }
+  if (text.includes('food') || text.includes('cuisine') || text.includes('culinary') || ['hyderabad', 'tokyo', 'paris', 'delhi', 'mumbai'].includes(region.id)) {
+    cats.push('food');
+  }
+  if (region.isInternational || ['mumbai', 'delhi', 'bengaluru', 'hyderabad', 'dubai', 'singapore', 'new-york', 'london', 'tokyo'].includes(region.id)) {
+    cats.push('city');
+  }
+  return cats;
 }
 
 export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
@@ -154,339 +92,207 @@ export const DestinationShowcase: React.FC<DestinationShowcaseProps> = ({
     }
   });
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const gridRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('travelmate_favorite_regions', JSON.stringify(favorites));
-    } catch {
-      // Ignore storage errors
-    }
-  }, [favorites]);
-
-  const toggleFavorite = (e: React.MouseEvent, regionId: string) => {
+  const toggleFavorite = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    setFavorites((prev) =>
-      prev.includes(regionId) ? prev.filter((id) => id !== regionId) : [...prev, regionId]
-    );
+    setFavorites((prev) => {
+      const updated = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      localStorage.setItem('travelmate_favorite_regions', JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  const displayedRegions = ALL_REGIONS.filter((region) => {
-    if (!matchesRegionFilter(region, filterType)) return false;
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      return (
-        region.name.toLowerCase().includes(q) ||
-        region.state.toLowerCase().includes(q) ||
-        (region.country && region.country.toLowerCase().includes(q)) ||
-        region.tagline.toLowerCase().includes(q) ||
-        region.destinations.some((d) => d.name.toLowerCase().includes(q))
-      );
-    }
-    return true;
+  const filteredRegions = ALL_REGIONS.filter((region) => {
+    if (filterType === 'favorites') return favorites.includes(region.id);
+    if (filterType === 'all') return true;
+    return getRegionCategories(region).includes(filterType);
+  }).filter((region) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      region.name.toLowerCase().includes(q) ||
+      (region.country || '').toLowerCase().includes(q) ||
+      region.state.toLowerCase().includes(q) ||
+      region.tagline.toLowerCase().includes(q)
+    );
   });
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    const match = ALL_REGIONS.find(
-      (r) =>
-        r.name.toLowerCase() === searchQuery.trim().toLowerCase() ||
-        r.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
-    );
-    if (match) {
-      onSelectRegion(match);
+    const q = searchQuery.trim();
+    if (!q) return;
+    const exactMatch = ALL_REGIONS.find((r) => r.name.toLowerCase() === q.toLowerCase());
+    if (exactMatch) {
+      onSelectRegion(exactMatch);
     } else {
-      onSearchCustomCity(searchQuery.trim());
+      onSearchCustomCity(q);
     }
   };
 
-  const filterButtons: Array<{
-    id: ShowcaseFilterType;
-    label: string;
-    icon: React.ReactNode;
-  }> = [
-    { id: 'all', label: 'All destinations', icon: <Compass className="w-3.5 h-3.5" /> },
-    { id: 'india', label: 'India', icon: <MapPin className="w-3.5 h-3.5" /> },
-    { id: 'international', label: 'International', icon: <Globe2 className="w-3.5 h-3.5" /> },
-    { id: 'beaches', label: 'Beaches', icon: <Palmtree className="w-3.5 h-3.5" /> },
-    { id: 'mountains', label: 'Mountains', icon: <Mountain className="w-3.5 h-3.5" /> },
-    { id: 'historical', label: 'Historical places', icon: <Landmark className="w-3.5 h-3.5" /> },
-    { id: 'adventure', label: 'Adventure', icon: <Flame className="w-3.5 h-3.5" /> },
-    { id: 'nature', label: 'Nature', icon: <Trees className="w-3.5 h-3.5" /> },
-    { id: 'cities', label: 'Cities', icon: <Building2 className="w-3.5 h-3.5" /> },
-  ];
-
-  const quickSuggestions = ['Goa', 'Paris', 'Jaipur', 'Tokyo', 'Dubai', 'Kerala', 'Rome', 'Bali'];
-
   return (
-    <div className="space-y-8">
-      {/* Immersive Travel Discovery Hero Section */}
-      <section className="relative rounded-[2rem] overflow-hidden bg-[#101828] text-white shadow-[0_24px_60px_-15px_rgba(16,24,40,0.35)] border border-white/10">
-        {/* Curated High-Res Travel Backdrop with Multi-Stop Dark Readability Overlay */}
-        <div className="absolute inset-0 pointer-events-none">
-          <img
-            src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1800&q=85"
-            alt="Scenic mountain lake travel landscape"
-            className="w-full h-full object-cover object-center opacity-45 scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#101828] via-[#101828]/85 to-[#101828]/55" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#101828] via-transparent to-[#101828]/40" />
-        </div>
-
-        <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-14 lg:px-14 lg:py-16 max-w-5xl">
-          {/* AI Companion Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-bold tracking-wide text-white mb-5">
-            <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse" />
-            <span>AI-POWERED WORLDWIDE TRAVEL DISCOVERY</span>
-          </div>
-
-          {/* Confident Display Headline */}
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
-            Your next adventure{' '}
-            <span className="bg-gradient-to-r from-[#8067F5] via-[#A78BFA] to-[#14B8A6] bg-clip-text text-transparent">
-              starts here.
-            </span>
+    <div className="space-y-12 pb-12">
+      {/* Editorial Photographic Hero */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pt-4">
+        <div className="lg:col-span-6 space-y-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#91A995]">
+            Thoughtful Travel Planning
+          </p>
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-[54px] font-semibold leading-[1.06] text-[#343A36]">
+            Discover somewhere wonderful.
           </h1>
-
-          {/* Supporting Subheadline */}
-          <p className="text-sm sm:text-base lg:text-lg text-slate-300 mt-4 max-w-2xl leading-relaxed font-normal">
-            Discover extraordinary destinations, plan smarter journeys, and travel confidently with your AI companion.
+          <p className="text-base sm:text-lg text-[#858B84] leading-relaxed max-w-xl">
+            Curated places, calm day-by-day itineraries, real weather and traffic context, and effortless shared trip rooms — all in one quiet space.
           </p>
 
-          {/* Prominent Worldwide Search Bar */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="mt-8 bg-white/95 backdrop-blur-xl p-2 rounded-2xl sm:rounded-3xl shadow-2xl border border-white/20 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 max-w-3xl"
-          >
-            <div className="relative flex-1 flex items-center">
-              <Search className="w-5 h-5 text-[#5145E5] ml-4 shrink-0" />
+          <div className="flex flex-wrap items-center gap-4 pt-1">
+            <button
+              type="button"
+              onClick={() => gridRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] text-sm font-medium transition-colors"
+            >
+              <span>Explore destinations</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 border-b border-[#D8D2C5] focus-within:border-[#243C32] py-1.5 min-w-[240px] flex-1 max-w-xs">
+              <Search className="w-4 h-4 text-[#858B84] shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search any destination, city, or landmark worldwide (e.g., Goa, Paris, Tokyo, Bali)..."
-                className="w-full bg-transparent pl-3 pr-4 py-3 text-sm font-medium text-[#101828] placeholder:text-[#64748B] focus:outline-none"
+                placeholder="Search any city worldwide..."
+                className="w-full bg-transparent text-sm text-[#343A36] placeholder-[#858B84] focus:outline-none"
               />
-            </div>
-            <button
-              type="submit"
-              disabled={isSearching}
-              className="px-6 py-3.5 bg-brand-gradient text-white rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold shadow-lg shadow-[#5145E5]/30 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-98 cursor-pointer disabled:opacity-50 shrink-0"
-            >
-              <Sparkles className="w-4 h-4 text-white" />
-              <span>{isSearching ? 'Discovering with AI...' : 'Explore with AI'}</span>
-            </button>
-          </form>
+              {searchQuery.trim() && (
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="text-xs font-medium text-[#243C32] hover:underline shrink-0"
+                >
+                  {isSearching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Search'}
+                </button>
+              )}
+            </form>
+          </div>
+        </div>
 
-          {/* Popular Destination Suggestions */}
-          <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-slate-300 mr-1">Popular right now:</span>
-            {quickSuggestions.map((place) => (
-              <button
-                key={place}
-                type="button"
-                onClick={() => {
-                  const preset = ALL_REGIONS.find(
-                    (r) => r.name.toLowerCase() === place.toLowerCase()
-                  );
-                  if (preset) {
-                    onSelectRegion(preset);
-                  } else {
-                    setSearchQuery(place);
-                    onSearchCustomCity(place);
-                  }
-                }}
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/15 backdrop-blur-md transition-all cursor-pointer"
-              >
-                {place}
-              </button>
-            ))}
+        {/* Hero Feature Photography */}
+        <div className="lg:col-span-6">
+          <div className="relative overflow-hidden rounded-3xl aspect-[16/10] bg-[#EFECE4]">
+            <img
+              src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1400&q=80"
+              alt="Scenic European morning skyline"
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
       </section>
 
-      {/* Functional Destination Filter Bar & Section Header */}
-      <section className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#5145E5]">
-              Curated Global Hubs
-            </span>
-            <h2 className="font-display text-2xl sm:text-3xl font-black text-[#101828] tracking-tight mt-0.5">
-              Explore Extraordinary Destinations
-            </h2>
-          </div>
-          <p className="text-xs sm:text-sm text-[#64748B] font-medium">
-            Showing <strong className="text-[#101828]">{displayedRegions.length}</strong> verified destination circuits
-          </p>
-        </div>
-
-        {/* Category Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {filterButtons.map((btn) => {
-            const active = filterType === btn.id;
+      {/* Underlined Editorial Category Filter Tabs */}
+      <section ref={gridRef} className="space-y-8">
+        <div className="border-b border-[#E6E2D8] flex items-center gap-6 overflow-x-auto no-scrollbar">
+          {CATEGORY_TABS.map((tab) => {
+            const active = filterType === tab.id;
             return (
               <button
-                key={btn.id}
+                key={tab.id}
                 type="button"
-                onClick={() => setFilterType(btn.id)}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition-all cursor-pointer border ${
+                onClick={() => setFilterType(tab.id)}
+                className={`relative pb-3 text-sm whitespace-nowrap transition-colors ${
                   active
-                    ? 'bg-[#101828] text-white border-[#101828] shadow-md shadow-[#101828]/15'
-                    : 'bg-white text-[#64748B] border-[#E8EAF2] hover:text-[#101828] hover:border-[#5145E5]/30 hover:bg-white'
+                    ? 'text-[#243C32] font-semibold'
+                    : 'text-[#858B84] hover:text-[#343A36] font-normal'
                 }`}
               >
-                <span className={active ? 'text-[#14B8A6]' : 'text-[#5145E5]'}>{btn.icon}</span>
-                <span>{btn.label}</span>
+                {tab.label}
+                {active && (
+                  <span className="absolute left-0 right-0 bottom-0 h-[2px] bg-[#243C32] rounded-full" />
+                )}
               </button>
             );
           })}
         </div>
 
-        {/* Redesigned Destination Discovery Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {displayedRegions.map((region) => {
-            const primaryCover =
-              REGION_COVER_IMAGES[region.id] ||
-              region.destinations[0]?.imageUrl ||
-              FALLBACK_DESTINATION_COVER;
-            const imgSrc = failedImages[region.id] ? FALLBACK_DESTINATION_COVER : primaryCover;
-            const isFav = favorites.includes(region.id);
-            const countryName = region.country || (region.isInternational ? 'International' : 'India');
-            const attractionCount = region.destinations.length;
-            const bestSeasonHint = region.destinations[0]?.bestTimeToVisit?.split('(')[0]?.trim();
-
-            return (
-              <article
-                key={region.id}
-                onClick={() => onSelectRegion(region)}
-                className="luxury-card group overflow-hidden flex flex-col justify-between cursor-pointer h-full"
+        {/* Open 3-Column Photographic Destination Grid */}
+        {filteredRegions.length === 0 ? (
+          <div className="py-12 text-center space-y-3">
+            <p className="text-sm text-[#858B84]">
+              No curated destinations matched &ldquo;{searchQuery || filterType}&rdquo;.
+            </p>
+            {searchQuery.trim() && (
+              <button
+                type="button"
+                onClick={() => onSearchCustomCity(searchQuery.trim())}
+                disabled={isSearching}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#243C32] text-[#FFFFFF] text-sm font-medium"
               >
-                {/* Immersive Photograph Container */}
-                <div>
-                  <div className="relative h-56 w-full bg-slate-100 overflow-hidden">
+                {isSearching ? 'Searching...' : `Explore "${searchQuery.trim()}" with AI`}
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
+            {filteredRegions.map((region) => {
+              const cover =
+                !failedImages[region.id] && REGION_COVER_IMAGES[region.id]
+                  ? REGION_COVER_IMAGES[region.id]
+                  : 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1000&q=80';
+              const isFav = favorites.includes(region.id);
+
+              return (
+                <article
+                  key={region.id}
+                  onClick={() => onSelectRegion(region)}
+                  className="group cursor-pointer space-y-3"
+                >
+                  <div className="relative overflow-hidden rounded-2xl aspect-[16/10] bg-[#EFECE4]">
                     <img
-                      src={imgSrc}
-                      alt={`${region.name}, ${countryName}`}
-                      onError={() =>
-                        setFailedImages((prev) => ({ ...prev, [region.id]: true }))
-                      }
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                      src={cover}
+                      alt={region.name}
                       loading="lazy"
+                      onError={() => setFailedImages((prev) => ({ ...prev, [region.id]: true }))}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#101828]/80 via-[#101828]/20 to-transparent pointer-events-none" />
-
-                    {/* Top Left Country Pill */}
-                    <div className="absolute top-3.5 left-3.5 bg-[#101828]/65 backdrop-blur-md text-white border border-white/15 px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5">
-                      <MapPin className="w-3 h-3 text-[#14B8A6]" />
-                      <span>{countryName}</span>
-                    </div>
-
-                    {/* Top Right Favorite Button */}
                     <button
                       type="button"
                       onClick={(e) => toggleFavorite(e, region.id)}
-                      aria-label={`Favorite ${region.name}`}
-                      className={`absolute top-3.5 right-3.5 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md border transition-all cursor-pointer ${
-                        isFav
-                          ? 'bg-rose-500 text-white border-rose-400 shadow-md'
-                          : 'bg-black/35 text-white/90 border-white/20 hover:bg-black/55'
-                      }`}
+                      aria-label={isFav ? `Remove ${region.name} from favorites` : `Save ${region.name}`}
+                      className="absolute top-3 right-3 w-9 h-9 rounded-full bg-[#FFFFFF]/90 backdrop-blur-xs flex items-center justify-center text-[#343A36] hover:scale-105 transition-transform"
                     >
-                      <Heart className={`w-4 h-4 ${isFav ? 'fill-white' : ''}`} />
+                      <Heart
+                        className={`w-4 h-4 ${isFav ? 'fill-[#D68B65] text-[#D68B65]' : 'text-[#343A36]'}`}
+                      />
                     </button>
-
-                    {/* Bottom Image Overlay: Destination Name & State */}
-                    <div className="absolute bottom-3.5 left-4 right-4 text-white pointer-events-none">
-                      <span className="text-[11px] font-semibold text-white/80 tracking-wide block">
-                        {region.state}
-                      </span>
-                      <h3 className="font-display text-xl font-black tracking-tight text-white leading-snug">
-                        {region.name}
-                      </h3>
-                    </div>
                   </div>
 
-                  {/* Card Body */}
-                  <div className="p-5 pb-4">
-                    <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed min-h-[2.5rem]">
-                      {region.tagline}
-                    </p>
-
-                    {/* Real Data Metadata Row */}
-                    <div className="mt-4 pt-3.5 border-t border-[#E8EAF2] flex items-center justify-between gap-2 text-xs">
-                      {attractionCount > 0 && (
-                        <span className="font-bold text-[#101828] bg-[#F7F8FC] border border-[#E8EAF2] px-2.5 py-1 rounded-lg">
-                          {attractionCount} {attractionCount === 1 ? 'attraction' : 'attractions'}
+                  <div className="flex items-start justify-between gap-3 pt-0.5">
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <h3 className="font-display text-lg font-semibold text-[#343A36] group-hover:text-[#243C32] transition-colors truncate">
+                          {region.name}
+                        </h3>
+                        <span className="text-xs text-[#858B84] shrink-0">
+                          {region.country || region.state}
                         </span>
-                      )}
-
-                      {bestSeasonHint && (
-                        <span className="text-[11px] font-medium text-[#64748B] flex items-center gap-1 truncate">
-                          <Sun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                          <span className="truncate">{bestSeasonHint}</span>
-                        </span>
-                      )}
+                      </div>
+                      <p className="text-sm text-[#858B84] line-clamp-1">
+                        {region.tagline}
+                      </p>
                     </div>
-                  </div>
-                </div>
 
-                {/* Clean Card Footer Action */}
-                <div className="px-5 pb-5 pt-1">
-                  <div className="w-full py-2.5 px-4 rounded-xl bg-[#F7F8FC] group-hover:bg-brand-gradient text-[#101828] group-hover:text-white font-bold text-xs flex items-center justify-between transition-all duration-300 border border-[#E8EAF2] group-hover:border-transparent">
-                    <span>Explore Destination</span>
-                    <ArrowUpRight className="w-4 h-4 text-[#5145E5] group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-[#243C32] shrink-0 pt-1 group-hover:translate-x-0.5 transition-transform">
+                      Explore <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
-        {/* Empty Filter / Search Fallback */}
-        {displayedRegions.length === 0 && (
-          <div className="text-center py-14 px-6 bg-white rounded-3xl border border-[#E8EAF2] shadow-xs">
-            <div className="w-12 h-12 rounded-2xl bg-[#5145E5]/10 text-[#5145E5] flex items-center justify-center mx-auto mb-3">
-              <Compass className="w-6 h-6" />
-            </div>
-            <h3 className="font-display font-bold text-[#101828] text-base">
-              {searchQuery
-                ? `Discover "${searchQuery}" with Google Gemini AI`
-                : 'No preset destinations match this filter'}
-            </h3>
-            <p className="text-xs text-[#64748B] mt-1.5 max-w-md mx-auto">
-              {searchQuery
-                ? 'Our AI travel engine can synthesize real-time sights, coordinates, and admission budgets for any city on Earth.'
-                : 'Try switching to All destinations or search any custom city above.'}
-            </p>
-            <div className="mt-5 flex items-center justify-center gap-3">
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => onSearchCustomCity(searchQuery.trim())}
-                  disabled={isSearching}
-                  className="px-5 py-2.5 bg-brand-gradient text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 cursor-pointer"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>{isSearching ? 'Discovering...' : `Explore "${searchQuery}" via AI`}</span>
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  setFilterType('all');
-                  setSearchQuery('');
-                }}
-                className="px-4 py-2.5 bg-[#F7F8FC] hover:bg-slate-200/70 text-[#101828] border border-[#E8EAF2] rounded-xl text-xs font-bold cursor-pointer"
-              >
-                Reset Filters
-              </button>
-            </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </section>
     </div>
   );
 };
+
+export default DestinationShowcase;

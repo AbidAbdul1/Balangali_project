@@ -25,7 +25,7 @@ import {
   Plus,
 } from 'lucide-react';
 
-interface TravelVaultPanelProps {
+export interface TravelVaultPanelProps {
   itinerary: ItineraryPlan | null;
   destinationCountryHint?: string;
   onLoadOfflineTrip: (trip: ItineraryPlan) => void;
@@ -242,7 +242,7 @@ export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
     });
     const off = await getOfflineTrips();
     setOfflineTrips(off);
-    onNotify(`Saved "${itinerary.title}" to offline IndexedDB vault.`);
+    onNotify(`Saved "${itinerary.title}" to offline vault.`);
   };
 
   const handleAddReminder = async (e: React.FormEvent) => {
@@ -261,62 +261,83 @@ export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Connectivity & Offline Sync Midnight Hero Banner */}
-      <div className="rounded-3xl bg-hero-midnight text-white p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_12px_36px_-10px_rgba(16,24,40,0.2)]">
-        <div className="flex items-center gap-3.5">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${isOnline ? 'bg-[#14B8A6]/20 text-[#14B8A6] border border-[#14B8A6]/30' : 'bg-amber-500/20 text-amber-300 border border-amber-400/30'}`}>
-            {isOnline ? <Wifi className="w-5 h-5" /> : <WifiOff className="w-5 h-5" />}
-          </div>
-          <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#14B8A6] block">
-              Travel Vault &amp; Offline Sync
-            </span>
-            <div className="font-display text-base sm:text-lg font-black text-white">
-              {isOnline ? 'Online — Live Maps, Weather & Cloud Sync Active' : 'Offline Mode — Accessing Cached Itineraries'}
-            </div>
-            <div className="text-xs text-slate-300 mt-0.5">
-              Store private travel documents, emergency contacts, and offline IndexedDB itineraries for zero-connectivity zones.
-            </div>
-          </div>
+    <div className="space-y-8 py-2">
+      {/* Editorial Header */}
+      <div className="pb-6 border-b border-[#E6E2D8] flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#91A995]">
+            Security &amp; Offline Readiness
+          </p>
+          <h2 className="font-display text-3xl font-semibold text-[#343A36] mt-1">
+            Travel Vault &amp; Offline Sync
+          </h2>
+          <p className="text-sm text-[#858B84] mt-1 max-w-2xl">
+            Store private booking files, offline itineraries in IndexedDB, and emergency numbers for low-signal journeys.
+          </p>
         </div>
-        {itinerary && (
-          <button
-            onClick={handleDownloadOffline}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-gradient text-white text-xs font-bold shadow-md cursor-pointer shrink-0"
-          >
-            <Download className="w-4 h-4" /> Save Current Trip Offline
-          </button>
-        )}
+
+        <div className="flex items-center gap-3">
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+            isOnline ? 'bg-[#91A995]/20 text-[#243C32]' : 'bg-[#D68B65]/20 text-[#D68B65]'
+          }`}>
+            {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
+            <span>{isOnline ? 'Online' : 'Offline'}</span>
+          </span>
+
+          {itinerary && (
+            <button
+              type="button"
+              onClick={handleDownloadOffline}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] text-xs font-medium transition-colors"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Save trip offline</span>
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Account & Private Travel Documents */}
-        <div className="lg:col-span-6 space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-indigo-600" />
-                Account & Private Travel Vault
-              </h3>
-              {user && (
-                <button onClick={handleLogout} className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:underline cursor-pointer">
-                  <LogOut className="w-3.5 h-3.5" /> Sign Out
-                </button>
-              )}
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Account & Documents */}
+        <div className="lg:col-span-6 space-y-8">
+          {/* Account Authentication */}
+          <div className="space-y-4">
+            <h3 className="font-display text-xl font-semibold text-[#343A36] flex items-center gap-2">
+              <Shield className="w-5 h-5 text-[#243C32]" />
+              <span>Travel Account</span>
+            </h3>
 
-            {!user ? (
-              <form onSubmit={handleAuthSubmit} className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <div className="flex gap-2 text-xs font-bold">
+            {user ? (
+              <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8] flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <UserCheck className="w-4 h-4 text-[#243C32]" />
+                    <span className="font-semibold text-[#343A36] text-sm">{user.name}</span>
+                  </div>
+                  <span className="text-xs text-[#858B84]">{user.email}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#E6E2D8] text-xs font-medium text-[#858B84] hover:text-[#343A36]"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign out</span>
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleAuthSubmit} className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8] space-y-3 text-xs">
+                <div className="flex items-center gap-4 border-b border-[#E6E2D8] pb-2 text-xs">
                   {(['login', 'register', 'reset'] as const).map((m) => (
                     <button
-                      type="button"
                       key={m}
+                      type="button"
                       onClick={() => setAuthMode(m)}
-                      className={`px-3 py-1 rounded-lg cursor-pointer ${authMode === m ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200'}`}
+                      className={`capitalize pb-1 transition-colors ${
+                        authMode === m ? 'font-semibold text-[#243C32] border-b-2 border-[#243C32]' : 'text-[#858B84]'
+                      }`}
                     >
-                      {m === 'login' ? 'Sign In' : m === 'register' ? 'Create Account' : 'Reset Password'}
+                      {m === 'reset' ? 'Reset password' : m}
                     </button>
                   ))}
                 </div>
@@ -324,318 +345,302 @@ export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
                 {authMode === 'register' && (
                   <input
                     type="text"
-                    placeholder="Full Name"
+                    required
+                    placeholder="Full name"
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs"
-                    required
+                    className="w-full px-3 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
                   />
                 )}
+
                 <input
                   type="email"
+                  required
                   placeholder="Email address"
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs"
-                  required
+                  className="w-full px-3 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
                 />
-                {authMode === 'reset' && resetTokenInput && (
-                  <input
-                    type="text"
-                    placeholder="Reset Token"
-                    value={resetTokenInput}
-                    onChange={(e) => setResetTokenInput(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs"
-                  />
-                )}
-                {(authMode !== 'reset' || resetTokenInput) && (
+
+                {authMode !== 'reset' && (
                   <input
                     type="password"
-                    placeholder="Password (min 8 characters)"
+                    required
+                    placeholder="Password"
                     value={passwordInput}
                     onChange={(e) => setPasswordInput(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs"
-                    required
+                    className="w-full px-3 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
                   />
                 )}
-                <button type="submit" className="w-full py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 cursor-pointer">
-                  {authMode === 'login' ? 'Sign In' : authMode === 'register' ? 'Register' : resetTokenInput ? 'Set New Password' : 'Request Reset Token'}
-                </button>
-                {googleOAuthEnabled && authMode !== 'reset' && (
-                  <a
-                    href="/api/auth/google"
-                    className="w-full inline-flex items-center justify-center gap-2 py-2 rounded-xl bg-white border border-slate-300 text-slate-800 text-xs font-bold hover:bg-slate-100 transition"
-                  >
-                    <span>Continue with Google</span>
-                  </a>
-                )}
-              </form>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-xs">
-                  <UserCheck className="w-4 h-4 text-indigo-600" />
-                  <div>
-                    <div className="font-bold text-slate-900">{user.name}</div>
-                    <div className="text-slate-500">{user.email}</div>
-                  </div>
-                </div>
 
-                {/* Upload Document */}
-                <form onSubmit={handleUploadDoc} className="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                  <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-indigo-600" /> Add Private Document / Booking Reference
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      placeholder="Title (e.g. Flight AI-102)"
-                      value={docTitle}
-                      onChange={(e) => setDocTitle(e.target.value)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs"
-                      required
-                    />
-                    <select
-                      value={docType}
-                      onChange={(e) => setDocType(e.target.value as any)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs"
-                    >
-                      <option value="ticket">Ticket</option>
-                      <option value="hotel">Hotel Confirmation</option>
-                      <option value="itinerary">Itinerary</option>
-                      <option value="visa">Visa / Entry</option>
-                      <option value="insurance">Insurance</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      placeholder="PNR / Booking Reference"
-                      value={docRef}
-                      onChange={(e) => setDocRef(e.target.value)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs"
-                    />
-                    <input
-                      type="file"
-                      accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.json"
-                      onChange={(e) => setDocFile(e.target.files?.[0] || null)}
-                      className="text-[11px] text-slate-600 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:bg-white file:text-xs file:font-semibold"
-                    />
-                  </div>
+                {authMode === 'reset' && resetTokenInput && (
                   <input
-                    type="text"
-                    placeholder="Private notes (optional)"
-                    value={docNotes}
-                    onChange={(e) => setDocNotes(e.target.value)}
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs"
+                    type="password"
+                    required
+                    placeholder="New password"
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
                   />
-                  <button type="submit" className="w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold cursor-pointer">
-                    <Upload className="w-3.5 h-3.5" /> Save to Private Vault
-                  </button>
-                </form>
+                )}
 
-                {/* Document List */}
-                <div className="space-y-2">
-                  {documents.map((d) => (
-                    <div key={d.id} className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 text-xs">
-                      <div>
-                        <div className="font-bold text-slate-900">{d.title} <span className="text-[10px] uppercase text-indigo-600">({d.docType})</span></div>
-                        {d.referenceNumber && <div className="text-[11px] text-slate-500">Ref: {d.referenceNumber}</div>}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {d.fileName && (
-                          <a href={`/api/documents/${d.id}/download`} className="text-indigo-600 font-semibold hover:underline">
-                            Download
-                          </a>
-                        )}
-                        <button
-                          onClick={async () => {
-                            await fetch(`/api/documents/${d.id}`, { method: 'DELETE' });
-                            loadSessionAndData();
-                          }}
-                          className="text-rose-500 hover:text-rose-700 cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                <button
+                  type="submit"
+                  className="w-full py-2.5 rounded-full bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] font-medium transition-colors"
+                >
+                  {authMode === 'login' ? 'Sign in' : authMode === 'register' ? 'Create account' : resetTokenInput ? 'Update password' : 'Send reset link'}
+                </button>
+              </form>
             )}
           </div>
 
-          {/* Offline Saved Trips */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-3">
-            <h3 className="font-display text-base font-extrabold text-slate-900">Offline Trips (IndexedDB)</h3>
-            {offlineTrips.length === 0 ? (
-              <p className="text-xs text-slate-500">No trips saved offline yet. Click "Save Current Trip Offline" above.</p>
+          {/* Private Documents */}
+          <div className="space-y-4">
+            <h3 className="font-display text-xl font-semibold text-[#343A36] flex items-center gap-2">
+              <FileText className="w-5 h-5 text-[#243C32]" />
+              <span>Private Documents</span>
+            </h3>
+
+            {user ? (
+              <form onSubmit={handleUploadDoc} className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8] space-y-3 text-xs">
+                <input
+                  type="text"
+                  required
+                  placeholder="Document title (e.g. Flight Ticket, Passport copy, Hotel Voucher)"
+                  value={docTitle}
+                  onChange={(e) => setDocTitle(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={docType}
+                    onChange={(e) => setDocType(e.target.value as any)}
+                    className="px-3 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
+                  >
+                    <option value="ticket">Ticket / Boarding Pass</option>
+                    <option value="hotel">Hotel Confirmation</option>
+                    <option value="visa">Visa / Travel Permit</option>
+                    <option value="insurance">Travel Insurance</option>
+                    <option value="other">Other Note</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Reference / PNR number"
+                    value={docRef}
+                    onChange={(e) => setDocRef(e.target.value)}
+                    className="px-3 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
+                  />
+                </div>
+                <input
+                  type="file"
+                  onChange={(e) => setDocFile(e.target.files?.[0] || null)}
+                  className="w-full text-xs text-[#858B84]"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-2.5 rounded-full bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] font-medium transition-colors inline-flex items-center justify-center gap-1.5"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Save document</span>
+                </button>
+              </form>
             ) : (
-              offlineTrips.map((t) => (
-                <div key={t.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-                  <div>
-                    <div className="font-bold text-slate-900">{t.title}</div>
-                    <div className="text-[11px] text-slate-500">
-                      Cached {new Date(t.downloadedAt).toLocaleString()} · {t.days.length} day(s)
+              <p className="text-xs text-[#858B84] p-4 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8]">
+                Sign in above to securely store and view personal travel documents across devices.
+              </p>
+            )}
+
+            {documents.length > 0 && (
+              <div className="divide-y divide-[#E6E2D8] border-t border-b border-[#E6E2D8]">
+                {documents.map((d) => (
+                  <div key={d.id} className="py-2.5 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-semibold text-[#343A36]">{d.title}</span>
+                      <span className="text-[#858B84] ml-2 font-mono uppercase text-[10px]">{d.docType}</span>
+                      {d.referenceNumber && <span className="text-[#858B84] ml-2 font-mono">({d.referenceNumber})</span>}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => onLoadOfflineTrip(t)} className="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-semibold cursor-pointer">
-                      Open
-                    </button>
                     <button
+                      type="button"
                       onClick={async () => {
-                        await removeOfflineTrip(t.id);
-                        setOfflineTrips(await getOfflineTrips());
+                        await fetch(`/api/documents/${d.id}`, { method: 'DELETE' });
+                        loadSessionAndData();
                       }}
-                      className="text-rose-500 cursor-pointer"
+                      className="text-[#858B84] hover:text-[#D68B65]"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         </div>
 
-        {/* Smart Travel Tools: Reminders, Emergency, Visa Links, Local Phrases */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* Travel Reminders */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-3">
-            <h3 className="font-display text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <Bell className="w-4 h-4 text-indigo-600" />
-              Travel Reminders
+        {/* Right Column: Reminders, Offline Trips & Country Emergency */}
+        <div className="lg:col-span-6 space-y-8">
+          {/* Offline Trips in IndexedDB */}
+          <div className="space-y-4">
+            <h3 className="font-display text-xl font-semibold text-[#343A36] flex items-center gap-2">
+              <Download className="w-5 h-5 text-[#243C32]" />
+              <span>Offline Itineraries</span>
             </h3>
-            <form onSubmit={handleAddReminder} className="flex gap-2">
+
+            {offlineTrips.length === 0 ? (
+              <p className="text-xs text-[#858B84] p-4 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8]">
+                No offline trips cached yet. Click &ldquo;Save trip offline&rdquo; above to make your active schedule accessible without internet.
+              </p>
+            ) : (
+              <div className="divide-y divide-[#E6E2D8] border-t border-b border-[#E6E2D8]">
+                {offlineTrips.map((rec) => (
+                  <div key={rec.id} className="py-2.5 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-semibold text-[#343A36]">{rec.trip.title}</span>
+                      <span className="text-[#858B84] ml-2">{rec.trip.days.length} days</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onLoadOfflineTrip(rec.trip)}
+                        className="text-xs font-medium text-[#243C32] hover:underline"
+                      >
+                        Open offline
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await removeOfflineTrip(rec.id);
+                          loadSessionAndData();
+                        }}
+                        className="text-[#858B84] hover:text-[#D68B65]"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Travel Reminders */}
+          <div className="space-y-4">
+            <h3 className="font-display text-xl font-semibold text-[#343A36] flex items-center gap-2">
+              <Bell className="w-5 h-5 text-[#243C32]" />
+              <span>Trip Reminders</span>
+            </h3>
+
+            <form onSubmit={handleAddReminder} className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8] flex gap-2 text-xs">
               <input
                 type="text"
-                placeholder="Reminder (e.g. Web check-in, Carry passport)"
+                required
+                placeholder="Reminder (e.g. Check in online, Pack sunscreen)"
                 value={reminderTitle}
                 onChange={(e) => setReminderTitle(e.target.value)}
-                className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 text-xs"
+                className="flex-1 px-3 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
               />
               <input
                 type="date"
                 value={reminderDate}
                 onChange={(e) => setReminderDate(e.target.value)}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs"
+                className="px-2 py-2 rounded-xl bg-[#F7F5EF] border border-[#E6E2D8] text-[#343A36]"
               />
-              <button type="submit" className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold cursor-pointer">
-                <Plus className="w-4 h-4" />
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-full bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] font-medium"
+              >
+                Add
               </button>
             </form>
-            <div className="space-y-1.5">
-              {reminders.map((r) => (
-                <div key={r.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 text-xs">
-                  <button
-                    onClick={async () => {
-                      await fetch(`/api/reminders/${r.id}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ completed: !r.completed }),
-                      });
-                      loadSessionAndData();
-                    }}
-                    className="flex items-center gap-2 text-left cursor-pointer"
-                  >
-                    <span className={`w-4 h-4 rounded flex items-center justify-center border ${r.completed ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'}`}>
-                      {r.completed && <Check className="w-3 h-3" />}
-                    </span>
-                    <span className={r.completed ? 'line-through text-slate-400' : 'text-slate-800 font-medium'}>
-                      {r.title} {r.dueDate && <span className="text-slate-400">({r.dueDate})</span>}
-                    </span>
-                  </button>
-                  <button
-                    onClick={async () => {
-                      await fetch(`/api/reminders/${r.id}`, { method: 'DELETE' });
-                      loadSessionAndData();
-                    }}
-                    className="text-rose-500 cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
+
+            {reminders.length > 0 && (
+              <div className="divide-y divide-[#E6E2D8] border-t border-b border-[#E6E2D8]">
+                {reminders.map((r) => (
+                  <div key={r.id} className="py-2.5 flex items-center justify-between text-xs">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await fetch(`/api/reminders/${r.id}`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ completed: !r.completed }),
+                        });
+                        loadSessionAndData();
+                      }}
+                      className="inline-flex items-center gap-2 text-left"
+                    >
+                      <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${r.completed ? 'bg-[#243C32] border-[#243C32] text-white' : 'border-[#D8D2C5]'}`}>
+                        {r.completed && <Check className="w-3 h-3" />}
+                      </span>
+                      <span className={r.completed ? 'line-through text-[#858B84]' : 'text-[#343A36] font-medium'}>
+                        {r.title}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await fetch(`/api/reminders/${r.id}`, { method: 'DELETE' });
+                        loadSessionAndData();
+                      }}
+                      className="text-[#858B84] hover:text-[#D68B65]"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Emergency, Official Visa Portal & Local Phrases */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="font-display text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <PhoneCall className="w-4 h-4 text-rose-600" />
-                Emergency, Visa & Local Phrases
+          {/* Emergency & Country Support Info */}
+          {countryInfo?.info && (
+            <div className="space-y-4">
+              <h3 className="font-display text-xl font-semibold text-[#343A36] flex items-center gap-2">
+                <PhoneCall className="w-5 h-5 text-[#243C32]" />
+                <span>Emergency &amp; Support ({countryInfo.info.country})</span>
               </h3>
-              <select
-                value={countryQuery}
-                onChange={(e) => {
-                  setCountryQuery(e.target.value);
-                  loadCountryInfo(e.target.value);
-                }}
-                className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-semibold"
-              >
-                <option value="india">India</option>
-                <option value="france">France</option>
-                <option value="japan">Japan</option>
-                <option value="italy">Italy</option>
-              </select>
-            </div>
 
-            {countryInfo?.info && (
-              <div className="space-y-3 text-xs">
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-100">
-                    <div className="text-[10px] font-bold text-rose-700 uppercase">Police</div>
-                    <div className="text-base font-extrabold text-slate-900">{countryInfo.info.emergency.police}</div>
+              <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8] space-y-3 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="p-2.5 rounded-xl bg-[#F7F5EF] space-y-0.5">
+                    <span className="text-[10px] text-[#858B84] uppercase">Police</span>
+                    <div className="font-bold text-[#343A36] text-sm">{countryInfo.info.emergency.police}</div>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-100">
-                    <div className="text-[10px] font-bold text-rose-700 uppercase">Ambulance</div>
-                    <div className="text-base font-extrabold text-slate-900">{countryInfo.info.emergency.ambulance}</div>
+                  <div className="p-2.5 rounded-xl bg-[#F7F5EF] space-y-0.5">
+                    <span className="text-[10px] text-[#858B84] uppercase">Ambulance</span>
+                    <div className="font-bold text-[#343A36] text-sm">{countryInfo.info.emergency.ambulance}</div>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-100">
-                    <div className="text-[10px] font-bold text-rose-700 uppercase">Fire / Universal</div>
-                    <div className="text-base font-extrabold text-slate-900">
+                  <div className="p-2.5 rounded-xl bg-[#F7F5EF] space-y-0.5 col-span-2 sm:col-span-1">
+                    <span className="text-[10px] text-[#858B84] uppercase">Universal / Fire</span>
+                    <div className="font-bold text-[#343A36] text-sm">
                       {countryInfo.info.emergency.universal || countryInfo.info.emergency.fire}
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 space-y-1">
-                  <div className="font-bold text-blue-900">Official Visa & Entry Portal ({countryInfo.info.country})</div>
-                  <p className="text-[11px] text-blue-800">{countryInfo.info.visaNote}</p>
-                  <a
-                    href={countryInfo.info.visaPortalUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-bold text-blue-700 hover:underline"
-                  >
-                    Visit Official Government Portal <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-
-                <div>
-                  <div className="font-bold text-slate-800 flex items-center gap-1.5 mb-2">
-                    <Languages className="w-3.5 h-3.5 text-indigo-600" /> Local Language Phrases
+                {countryInfo.info.visaPortalUrl && (
+                  <div className="pt-2 border-t border-[#E6E2D8] flex items-center justify-between">
+                    <div>
+                      <span className="font-medium text-[#343A36]">Official Visa / Entry Portal</span>
+                      <p className="text-[11px] text-[#858B84]">{countryInfo.info.visaNote}</p>
+                    </div>
+                    <a
+                      href={countryInfo.info.visaPortalUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-[#243C32] font-medium hover:underline"
+                    >
+                      <span>Open</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
-                  <div className="space-y-1.5">
-                    {countryInfo.info.phrases.map((p: any, idx: number) => (
-                      <div key={idx} className="p-2 rounded-lg bg-slate-50 flex items-center justify-between gap-2">
-                        <span className="font-semibold text-slate-700">{p.english}</span>
-                        <span className="text-right">
-                          <span className="font-bold text-indigo-700">{p.local}</span>{' '}
-                          <span className="text-[10px] text-slate-500">({p.pronunciation})</span>
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
+export default TravelVaultPanel;
