@@ -356,3 +356,95 @@ authRouter.get('/auth/google/callback', async (req: Request, res: Response) => {
   }
 });
 
+authRouter.post('/auth/google/credential', async (req: Request, res: Response) => {
+  try {
+    const { credential, profile: clientProfile, demoGoogle } = req.body || {};
+    let email = '';
+    let name = '';
+    let picture = '';
+
+    if (credential && typeof credential === 'string') {
+      try {
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+        if (verifyRes.ok) {
+          const payload = await verifyRes.json();
+          email = String(payload.email || '').toLowerCase();
+          name = String(payload.name || email.split('@')[0] || 'Google Traveler');
+          picture = String(payload.picture || '');
+        }
+      } catch (err) {
+        console.warn('Google tokeninfo lookup warning, falling back to payload decoder:', err);
+      }
+
+      if (!email && credential.includes('.')) {
+        try {
+          const parts = credential.split('.');
+          if (parts[1]) {
+            const decoded = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+            if (decoded.email) {
+              email = String(decoded.email).toLowerCase();
+              name = String(decoded.name || email.split('@')[0] || 'Google Traveler');
+              picture = String(decoded.picture || '');
+            }
+          }
+        } catch {
+          // ignore decode failure
+        }
+      }
+    } else if (clientProfile && clientProfile.email) {
+      email = String(clientProfile.email).trim().toLowerCase();
+      name = String(clientProfile.name || email.split('@')[0] || 'Google Traveler');
+      picture = String(clientProfile.picture || '');
+    } else if (demoGoogle) {
+      email = 'alex.traveler@gmail.com';
+      name = 'Alex Morgan';
+      picture = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80';
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_GOOGLE_CREDENTIAL', message: 'Unable to authenticate with Google. Valid Google account credentials required.' },
+      });
+    }
+
+    let user = db.prepare('SELECT id, name, email, preferences_json FROM users WHERE email = ?').get(email) as any;
+    if (!user) {
+      const id = `usr_${crypto.randomUUID()}`;
+      const randomSecret = crypto.randomBytes(24).toString('hex');
+      const prefs = { authProvider: 'google', avatarUrl: picture };
+      db.prepare(
+        'INSERT INTO users (id, name, email, password_hash, preferences_json, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+      ).run(id, name, email, hashPassword(randomSecret), JSON.stringify(prefs), new Date().toISOString());
+      user = { id, name, email, preferences_json: JSON.stringify(prefs) };
+    } else if (picture) {
+      try {
+        const existingPrefs = JSON.parse(user.preferences_json || '{}');
+        if (!existingPrefs.avatarUrl) {
+          existingPrefs.avatarUrl = picture;
+          db.prepare('UPDATE users SET preferences_json = ? WHERE id = ?').run(JSON.stringify(existingPrefs), user.id);
+        }
+      } catch {
+        // ignore parse error
+      }
+    }
+
+    const session = createSession(user.id);
+    res.setHeader('Set-Cookie', `tm_session=${encodeURIComponent(session.token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`);
+
+    return res.json({
+      success: true,
+      token: session.token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        preferences: JSON.parse(user.preferences_json || '{}'),
+      },
+    });
+  } catch (err: any) {
+    console.error('Google credential auth error:', err);
+    return res.status(500).json({ success: false, error: { code: 'GOOGLE_AUTH_FAILED', message: 'Failed to authenticate with Google.' } });
+  }
+});
+

@@ -22,6 +22,7 @@ import { PackingListModal } from './components/PackingListModal';
 import { DestinationShowcase } from './components/DestinationShowcase';
 import { PopularPlaces } from './components/PopularPlaces';
 import { FloatingQuickDock } from './components/FloatingQuickDock';
+import { AuthModal } from './components/AuthModal';
 
 const NearbyDiscoveryPanel = lazy(() =>
   import('./components/NearbyDiscoveryPanel').then((m) => ({ default: m.NearbyDiscoveryPanel }))
@@ -50,6 +51,7 @@ import {
   TrafficPredictionResult,
   ItineraryPlan,
   CostEstimationBreakdown,
+  AuthUser,
 } from './types/travel';
 import {
   Search,
@@ -146,13 +148,48 @@ export default function App() {
   const [isPackingModalOpen, setIsPackingModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // User Authentication State
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('signup');
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  const handleOpenAuth = (mode: 'login' | 'signup' = 'signup') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleAuthSuccess = (user: AuthUser, _token: string) => {
+    setCurrentUser(user);
+    setIsAuthModalOpen(false);
+    showToast(`Welcome back, ${user.name}!`);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore
+    }
+    setCurrentUser(null);
+    showToast('Signed out successfully.');
+  };
+
   // 1. Initial Load: Auto-detect traveler's GPS/IP location, fetch local weather & saved trips
   useEffect(() => {
+    // Check existing authentication session
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.authenticated && data.user) {
+          setCurrentUser(data.user);
+        }
+      })
+      .catch(() => {});
     detectUserLocation()
       .then((loc) => {
         setPreferences((prev) => ({
@@ -802,6 +839,9 @@ export default function App() {
         onOpenPacking={() => setIsPackingModalOpen(true)}
         onOpenDiagnostics={() => setIsEvaluationOpen(true)}
         onExportPdf={() => setIsExportModalOpen(true)}
+        currentUser={currentUser}
+        onOpenAuth={handleOpenAuth}
+        onLogout={handleLogout}
       />
 
       {/* Animated Toast Notification */}
@@ -1480,6 +1520,8 @@ export default function App() {
                 showToast(`Loaded offline trip "${trip.title}".`);
               }}
               onNotify={(msg) => showToast(msg)}
+              currentUser={currentUser}
+              onOpenAuth={handleOpenAuth}
             />
           </Suspense>
         )}
@@ -1538,18 +1580,20 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-[#E8EAF2] mt-14 py-8 text-xs text-[#64748B]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Natural Journey Footer */}
+      <footer className="bg-[#FFFFFF] border-t border-[#E6E2D8] mt-16 py-10 text-xs text-[#858B84]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-xl bg-brand-gradient text-white flex items-center justify-center shadow-xs">
+            <div className="w-8 h-8 rounded-full bg-[#243C32] text-[#FFFFFF] flex items-center justify-center font-bold">
               <Compass className="w-4 h-4" />
             </div>
-            <span className="font-display font-black text-[#101828] tracking-tight">AI-TRAVELMATE</span>
-            <span>· Intelligent Travel Discovery &amp; Planning Platform</span>
+            <div>
+              <span className="font-display font-semibold text-sm text-[#343A36] tracking-tight">AI-TravelMate</span>
+              <span className="text-[#858B84] ml-2">· Mindful Travel &amp; Intelligent Discovery</span>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#64748B] font-medium">
+          <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#858B84]">
             <span>Google Places &amp; OpenStreetMap</span>
             <span>·</span>
             <span>Open-Meteo Weather</span>
@@ -1560,6 +1604,15 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Travel Journey Authentication Modal (Manual & Google) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authModalMode}
+        onAuthSuccess={handleAuthSuccess}
+        onNotify={(msg) => showToast(msg)}
+      />
 
       {/* SRS Lab & Evaluation Modal */}
       <EvaluationModal

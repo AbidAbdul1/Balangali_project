@@ -473,5 +473,17 @@ export interface ReschedulePreview {
   proposedPlan: ItineraryPlan;
 }
 
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  preferences?: {
+    authProvider?: 'database' | 'google' | string;
+    avatarUrl?: string;
+    [key: string]: any;
+  };
+}
+
+
 
 

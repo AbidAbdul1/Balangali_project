@@ -13,9 +13,12 @@ import {
   Coins,
   Activity,
   ChevronDown,
+  User,
+  LogOut,
 } from 'lucide-react';
 import { useLanguage, CurrencyCode } from '../context/LanguageContext';
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from '../i18n/translations';
+import { AuthUser } from '../types/travel';
 
 export type NavTabId =
   | 'explore'
@@ -37,6 +40,9 @@ export interface NavbarProps {
   onOpenPacking?: () => void;
   onOpenDiagnostics?: () => void;
   onExportPdf?: () => void;
+  currentUser?: AuthUser | null;
+  onOpenAuth?: (mode?: 'login' | 'signup') => void;
+  onLogout?: () => void;
 }
 
 const CENTER_LINKS: Array<{ id: NavTabId; label: string }> = [
@@ -63,16 +69,24 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenPacking,
   onOpenDiagnostics,
   onExportPdf,
+  currentUser,
+  onOpenAuth,
+  onLogout,
 }) => {
   const { language, setLanguage, currency, setCurrency } = useLanguage();
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
         setMoreOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -83,6 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     setActiveTab(tab);
     setMoreOpen(false);
     setMobileOpen(false);
+    setUserMenuOpen(false);
   };
 
   return (
@@ -275,6 +290,88 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
           </div>
+
+          {/* User Account / Sign In */}
+          {currentUser ? (
+            <div className="relative ml-1" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                className="inline-flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full text-xs font-semibold bg-[#FFFFFF] border border-[#D8D2C5] hover:border-[#243C32] text-[#343A36] transition-all shadow-sm"
+              >
+                {currentUser.preferences?.avatarUrl ? (
+                  <img
+                    src={currentUser.preferences.avatarUrl}
+                    alt={currentUser.name}
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="w-6 h-6 rounded-full bg-[#243C32] text-[#FFFFFF] flex items-center justify-center font-bold text-[10px]">
+                    {currentUser.name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="max-w-[110px] truncate">{currentUser.name.split(' ')[0]}</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-[#858B84] transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-[#FFFFFF] border border-[#E6E2D8] rounded-2xl shadow-lg py-2 z-50">
+                  <div className="px-4 py-2.5 border-b border-[#E6E2D8]">
+                    <div className="font-semibold text-xs text-[#343A36] truncate">{currentUser.name}</div>
+                    <div className="text-[11px] text-[#858B84] truncate">{currentUser.email}</div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate('vault');
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-xs text-[#343A36] hover:bg-[#F7F5EF] flex items-center gap-2.5"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#243C32]" />
+                    <span>Travel Vault & Documents</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      if (onOpenSavedTrips) onOpenSavedTrips();
+                      else navigate('itinerary');
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-xs text-[#343A36] hover:bg-[#F7F5EF] flex items-center gap-2.5"
+                  >
+                    <Bookmark className="w-3.5 h-3.5 text-[#243C32]" />
+                    <span>My Saved Trips ({savedTripsCount})</span>
+                  </button>
+
+                  <div className="my-1 border-t border-[#E6E2D8]" />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      if (onLogout) onLogout();
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-[#D68B65] hover:bg-[#D68B65]/10 flex items-center gap-2.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onOpenAuth && onOpenAuth('signup')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] shadow-sm hover:shadow transition-all ml-1"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Sign Up / Log In</span>
+            </button>
+          )}
         </div>
 
         {/* Mobile Hamburger */}
@@ -368,6 +465,54 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="px-3 py-2 rounded-xl text-xs font-medium text-[#243C32] bg-[#FFFFFF] border border-[#E6E2D8]"
               >
                 Export PDF
+              </button>
+            )}
+          </div>
+
+          {/* Mobile User Section */}
+          <div className="pt-3 border-t border-[#E6E2D8]">
+            {currentUser ? (
+              <div className="p-3 bg-[#FFFFFF] rounded-2xl border border-[#E6E2D8] flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  {currentUser.preferences?.avatarUrl ? (
+                    <img
+                      src={currentUser.preferences.avatarUrl}
+                      alt={currentUser.name}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="w-8 h-8 rounded-full bg-[#243C32] text-[#FFFFFF] flex items-center justify-center font-bold text-xs">
+                      {currentUser.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <div>
+                    <div className="text-xs font-semibold text-[#343A36]">{currentUser.name}</div>
+                    <div className="text-[10px] text-[#858B84] truncate max-w-[150px]">{currentUser.email}</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    if (onLogout) onLogout();
+                  }}
+                  className="px-2.5 py-1.5 text-[#D68B65] hover:bg-[#D68B65]/10 rounded-lg text-xs flex items-center gap-1 font-semibold"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Exit</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  if (onOpenAuth) onOpenAuth('signup');
+                }}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-[#243C32] text-[#FFFFFF] flex items-center justify-center gap-2 shadow-sm"
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>Sign Up / Log In</span>
               </button>
             )}
           </div>

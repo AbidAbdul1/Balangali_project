@@ -30,6 +30,8 @@ export interface TravelVaultPanelProps {
   destinationCountryHint?: string;
   onLoadOfflineTrip: (trip: ItineraryPlan) => void;
   onNotify: (msg: string) => void;
+  currentUser?: { id: string; name: string; email: string; preferences?: any } | null;
+  onOpenAuth?: (mode?: 'login' | 'signup') => void;
 }
 
 export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
@@ -37,9 +39,11 @@ export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
   destinationCountryHint = 'India',
   onLoadOfflineTrip,
   onNotify,
+  currentUser,
+  onOpenAuth,
 }) => {
   // Auth state
-  const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(currentUser || null);
   const [authMode, setAuthMode] = useState<'login' | 'register' | 'reset'>('login');
   const [nameInput, setNameInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
@@ -326,8 +330,30 @@ export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleAuthSubmit} className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8] space-y-3 text-xs">
-                <div className="flex items-center gap-4 border-b border-[#E6E2D8] pb-2 text-xs">
+              <div className="space-y-4">
+                {onOpenAuth && (
+                  <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8] space-y-3 text-xs">
+                    <div>
+                      <div className="font-semibold text-sm text-[#343A36]">Unlock Your Private Travel Vault</div>
+                      <p className="text-xs text-[#858B84] mt-0.5">
+                        Sign in with Google or create an account to store boarding passes, hotel confirmations, and emergency contacts.
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => onOpenAuth('signup')}
+                        className="py-2.5 px-4 rounded-full bg-[#243C32] hover:bg-[#1B2E26] text-[#FFFFFF] font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm"
+                      >
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>Sign Up / Sign In with Google</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handleAuthSubmit} className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E6E2D8] space-y-3 text-xs">
+                  <div className="flex items-center gap-4 border-b border-[#E6E2D8] pb-2 text-xs">
                   {(['login', 'register', 'reset'] as const).map((m) => (
                     <button
                       key={m}
@@ -391,6 +417,7 @@ export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
                   {authMode === 'login' ? 'Sign in' : authMode === 'register' ? 'Create account' : resetTokenInput ? 'Update password' : 'Send reset link'}
                 </button>
               </form>
+              </div>
             )}
           </div>
 

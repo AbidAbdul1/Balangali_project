@@ -107,6 +107,29 @@ describe('1. Password Hashing & Authentication', () => {
     });
     assert.equal(delAttempt.status, 404);
   });
+
+  it('authenticates via Google credential exchange and manages sessions', async () => {
+    const res = await fetch(`${baseUrl}/api/auth/google/credential`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ demoGoogle: true }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.user.email, 'alex.traveler@gmail.com');
+    assert.equal(data.user.name, 'Alex Morgan');
+    assert.ok(data.token);
+
+    // Verify session reading with Bearer token
+    const meRes = await fetch(`${baseUrl}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${data.token}` },
+    });
+    assert.equal(meRes.status, 200);
+    const meData = await meRes.json();
+    assert.equal(meData.authenticated, true);
+    assert.equal(meData.user.email, 'alex.traveler@gmail.com');
+  });
 });
 
 describe('2. Expense Splitting & Balance Simplification', () => {
