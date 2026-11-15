@@ -494,13 +494,13 @@ export const TravelVaultPanel: React.FC<TravelVaultPanelProps> = ({
                 {offlineTrips.map((rec) => (
                   <div key={rec.id} className="py-2.5 flex items-center justify-between text-xs">
                     <div>
-                      <span className="font-semibold text-[#343A36]">{rec.trip.title}</span>
-                      <span className="text-[#858B84] ml-2">{rec.trip.days.length} days</span>
+                      <span className="font-semibold text-[#343A36]">{rec.title}</span>
+                      <span className="text-[#858B84] ml-2">{rec.days?.length || 0} days</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => onLoadOfflineTrip(rec.trip)}
+                        onClick={() => onLoadOfflineTrip(rec)}
                         className="text-xs font-medium text-[#243C32] hover:underline"
                       >
                         Open offline

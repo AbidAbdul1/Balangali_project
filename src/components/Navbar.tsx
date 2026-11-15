@@ -27,6 +27,8 @@ export type NavTabId =
   | 'vault'
   | 'saved';
 
+export type NavTab = NavTabId;
+
 export interface NavbarProps {
   activeTab: string;
   setActiveTab: (tab: any) => void;

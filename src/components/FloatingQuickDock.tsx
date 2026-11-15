@@ -1,6 +1,10 @@
 import React from 'react';
 
 export interface FloatingQuickDockProps {
+  activeTab?: string;
+  onSelectTab?: (tab: any) => void;
+  onOpenPackingList?: () => void;
+  onOpenExportSheet?: () => void;
   onOpenCurrency?: () => void;
   onOpenLanguage?: () => void;
   onOpenPacking?: () => void;
