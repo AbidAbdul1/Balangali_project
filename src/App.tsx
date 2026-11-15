@@ -197,18 +197,8 @@ export default function App() {
           startingLocation: loc,
         }));
         fetchWeather(loc.latitude, loc.longitude, loc.name);
-        if (loc.detectionMethod === 'windows-location-service') {
-          showToast(`📍 Windows Location Locked: ${loc.name.split(',')[0]} (±${loc.accuracyMeters}m)`);
-        } else if (loc.detectionMethod === 'wifi-triangulation') {
-          showToast(`🎯 Wi-Fi Triangulated: ${loc.name.split(',')[0]} (±${loc.accuracyMeters}m)`);
-        } else if (loc.detectionMethod === 'ip-geolocation-estimate') {
-          if (loc.isCellularHotspot) {
-            showToast(`📶 Mobile Hotspot Detected: ${loc.name.split(',')[0]} (Regional IP estimate)`);
-          } else if (loc.isVPNOrProxy) {
-            showToast(`🛡️ VPN/Proxy Detected: ${loc.name.split(',')[0]} (Regional IP estimate)`);
-          } else {
-            showToast(`🌐 Regional IP Estimate: ${loc.name.split(',')[0]}`);
-          }
+        if (loc.name) {
+          showToast(`📍 Starting Location: ${loc.name.split(',')[0]}`);
         }
       })
       .catch((err) => {

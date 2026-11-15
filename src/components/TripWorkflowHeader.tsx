@@ -550,7 +550,7 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
           </div>
         </div>
 
-        {/* Expandable Selected Stops & Optional GPS Diagnostics */}
+        {/* Expandable Selected Stops */}
         {showDetailsStrip && selectedDestinations.length > 0 && (
           <div className="mt-3 pt-3 border-t border-[#E6E2D8] flex flex-wrap items-center gap-2">
             {selectedDestinations.map((dest) => (
@@ -571,17 +571,6 @@ export const TripWorkflowHeader: React.FC<TripWorkflowHeaderProps> = ({
                 )}
               </span>
             ))}
-          </div>
-        )}
-
-        {diagnostics && (
-          <div className="mt-3">
-            <LocationDiagnosticsCard
-              diagnostics={diagnostics}
-              onRefresh={handleDetectGps}
-              isLoading={isDetectingGps}
-              onOpenMapPicker={() => setIsMapPickerOpen(true)}
-            />
           </div>
         )}
       </div>
